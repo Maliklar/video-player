@@ -1,0 +1,74 @@
+.container {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  max-width: 500px;
+  object-fit: contain;
+
+  & button {
+    position: relative;
+    background-color: transparent;
+    border: none;
+    outline: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .video {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+
+  .footer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 5px 8px;
+    background: linear-gradient(transparent, black);
+    .progressContainer {
+      position: relative;
+      width: 100%;
+      .progress {
+        height: 3px;
+        width: 0%;
+        background-color: white;
+      }
+    }
+    .controls {
+      position: relative;
+      display: flex;
+      align-items: center;
+      width: 100%;
+      height: 50px;
+    }
+  }
+}
+
+/**
+
+Play Icon
+
+**/
+
+.PlayIcon {
+  position: relative;
+  height: 0px;
+  width: 0px;
+  border: 14px white solid;
+  border-top-color: transparent;
+  border-bottom-color: transparent;
+  border-right: transparent;
+  border-left: 28px solid white;
+  border-radius: 3px;
+
+  transition: border 0.2s, transform 0.3s;
+  &[data-playing="true"] {
+    border: 14px white solid;
+    transform: rotate(180deg);
+  }
+}
