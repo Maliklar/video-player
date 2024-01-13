@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import styles from "./index.module.scss";
+import Controls from "../Controls";
+import Progress from "../Progress";
 
 export default function VideoPlayer() {
   const [isPlaying, setIsPlaying] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const interval = useRef<NodeJS.Timeout>();
   const [percentage, setPercentage] = useState(0);
   function togglePlaying() {
     setIsPlaying((playing) => {
@@ -51,26 +52,10 @@ export default function VideoPlayer() {
       <video src="./test.mp4" className={styles.video} ref={videoRef} />
       <div className={styles.footer}>
         <div className={styles.progressContainer}>
-          <div
-            className={styles.progress}
-            style={{
-              width: `${percentage}%`,
-            }}
-          />
+          <Progress percentage={percentage} />
         </div>
-        <div className={styles.controls}>
-          <button title="Play" onClick={togglePlaying} type="button">
-            <PlayIcon isPlaying={isPlaying} />
-          </button>
-        </div>
+        <Controls onPlayChange={togglePlaying} isPlaying={isPlaying} />
       </div>
     </div>
   );
-}
-
-type Props = {
-  isPlaying: boolean;
-};
-function PlayIcon({ isPlaying = false }: Props) {
-  return <div className={styles.PlayIcon} data-playing={isPlaying}></div>;
 }
