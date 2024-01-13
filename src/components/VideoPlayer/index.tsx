@@ -51,9 +51,7 @@ export default function VideoPlayer() {
     <div className={styles.container}>
       <video src="./test.mp4" className={styles.video} ref={videoRef} />
       <div className={styles.footer}>
-        <div className={styles.progressContainer}>
-          <Progress percentage={percentage} />
-        </div>
+        <Progress percentage={percentage} />
         <Controls onPlayChange={togglePlaying} isPlaying={isPlaying} />
       </div>
     </div>

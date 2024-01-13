@@ -8,7 +8,8 @@
       "default",
       {
         "ignore": [
-          "padding-inline"
+          "padding-inline",
+          "aspect-ratio"
         ]
       }
     ]
