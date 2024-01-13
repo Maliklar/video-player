@@ -1,0 +1,13 @@
+.rootPlayer {
+  position: relative;
+  box-sizing: border-box;
+  & > * {
+    box-sizing: border-box;
+  }
+}
+
+@mixin flex($justify: center, $align: center) {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

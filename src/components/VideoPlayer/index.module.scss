@@ -1,8 +1,8 @@
+@import "./root.module.scss";
+
 .container {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  @extend .rootPlayer;
+  @include flex();
   max-width: 500px;
   object-fit: contain;
 
@@ -13,6 +13,7 @@
     outline: none;
     margin: 0;
     padding: 0;
+    cursor: pointer;
   }
 
   .video {
@@ -30,21 +31,10 @@
     flex-direction: column;
     padding: 5px 8px;
     background: linear-gradient(transparent, black);
+
     .progressContainer {
       position: relative;
       width: 100%;
-      .progress {
-        height: 3px;
-        width: 0%;
-        background-color: white;
-      }
-    }
-    .controls {
-      position: relative;
-      display: flex;
-      align-items: center;
-      width: 100%;
-      height: 50px;
     }
   }
 }
