@@ -2,44 +2,50 @@ import { useEffect, useRef, useState } from "react";
 import styles from "./index.module.scss";
 
 export default function VideoPlayer() {
-  const [playing, setPlaying] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const interval = useRef<NodeJS.Timeout>();
-  const [currentTime, setCurrentTime] = useState(0);
   const [percentage, setPercentage] = useState(0);
   function togglePlaying() {
-    setPlaying((playing) => {
+    setIsPlaying((playing) => {
       !playing ? videoRef.current?.play() : videoRef.current?.pause();
       return !playing;
     });
   }
 
-  console.log(videoRef.current?.duration);
+  // Percentage Change Handler
   useEffect(() => {
-    if (!videoRef.current) return;
-    if (
-      typeof videoRef.current?.currentTime === "undefined" ||
-      typeof videoRef.current?.duration === "undefined"
-    )
-      return;
-    if (!playing) return clearInterval(interval.current);
-    interval.current = setInterval(() => {
-      if (
-        typeof videoRef.current?.currentTime === "undefined" ||
-        typeof videoRef.current?.duration === "undefined"
-      )
-        return;
-      setCurrentTime(videoRef.current.currentTime);
-      setPercentage(
-        (videoRef.current.currentTime / videoRef.current?.duration) * 100
-      );
-      console.log(videoRef.current.currentTime);
-    }, 100);
+    if (!isPlaying) return;
+    const interval = setInterval(() => {
+      const currentTime = videoRef.current?.currentTime;
+      const duration = videoRef.current?.duration;
+      if (!currentTime || !duration || !isPlaying) return;
+      setPercentage((currentTime / duration) * 100);
+    });
 
     return () => {
-      clearInterval(interval.current);
+      clearInterval(interval);
     };
-  }, [playing]);
+  }, [isPlaying]);
+  // Playing Change Handler
+  useEffect(() => {
+    if (!videoRef.current) return;
+    const video = videoRef.current;
+    function onPlayHandler() {
+      setIsPlaying(true);
+    }
+    function onPauseHandler() {
+      setIsPlaying(false);
+    }
+    video.addEventListener("play", onPlayHandler);
+    video.addEventListener("pause", onPauseHandler);
+    return () => {
+      video.removeEventListener("play", onPlayHandler);
+      video.removeEventListener("pause", onPauseHandler);
+    };
+  }, []);
+
+  useEffect(() => {}, []);
   return (
     <div className={styles.container}>
       <video src="./test.mp4" className={styles.video} ref={videoRef} />
@@ -54,7 +60,7 @@ export default function VideoPlayer() {
         </div>
         <div className={styles.controls}>
           <button title="Play" onClick={togglePlaying} type="button">
-            <PlayIcon playing={playing} />
+            <PlayIcon isPlaying={isPlaying} />
           </button>
         </div>
       </div>
@@ -63,8 +69,8 @@ export default function VideoPlayer() {
 }
 
 type Props = {
-  playing: boolean;
+  isPlaying: boolean;
 };
-function PlayIcon({ playing = false }: Props) {
-  return <div className={styles.PlayIcon} data-playing={playing}></div>;
+function PlayIcon({ isPlaying = false }: Props) {
+  return <div className={styles.PlayIcon} data-playing={isPlaying}></div>;
 }
