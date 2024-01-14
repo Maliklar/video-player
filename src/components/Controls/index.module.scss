@@ -35,8 +35,8 @@ Play Icon
   border-right: transparent;
   border-left: 28px solid white;
   border-radius: 3px;
-
   transition: border 0.2s, transform 0.3s;
+
   &[data-playing="true"] {
     border: 14px white solid;
     transform: rotate(180deg);
