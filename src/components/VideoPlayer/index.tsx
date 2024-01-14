@@ -6,7 +6,15 @@ import Progress from "../Progress";
 export default function VideoPlayer() {
   const [isPlaying, setIsPlaying] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isFullScreen, setIsFullScreen] = useState(false);
   const [percentage, setPercentage] = useState(0);
+
+  function toggleFullScreen() {
+    if (isFullScreen) document.exitFullscreen();
+    else containerRef.current?.requestFullscreen();
+    setIsFullScreen((i) => !i);
+  }
   function togglePlaying() {
     setIsPlaying((playing) => {
       !playing ? videoRef.current?.play() : videoRef.current?.pause();
@@ -47,12 +55,28 @@ export default function VideoPlayer() {
   }, []);
 
   useEffect(() => {}, []);
+
   return (
-    <div className={styles.container}>
-      <video src="./test.mp4" className={styles.video} ref={videoRef} />
+    <div
+      className={styles.container}
+      ref={containerRef}
+      data-fullscreen={isFullScreen}
+    >
+      <video
+        src="./test.mp4"
+        className={styles.video}
+        ref={videoRef}
+        controls={false}
+        data-fullscreen="true"
+        controlsList="nodownload nofullscreen noremoteplayback"
+      />
       <div className={styles.footer}>
         <Progress percentage={percentage} onProgressChange={() => {}} />
-        <Controls onPlayChange={togglePlaying} isPlaying={isPlaying} />
+        <Controls
+          onPlayChange={togglePlaying}
+          isPlaying={isPlaying}
+          toggleFullScreen={toggleFullScreen}
+        />
       </div>
     </div>
   );

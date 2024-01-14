@@ -3,8 +3,13 @@ import styles from "./index.module.scss";
 type Props = {
   onPlayChange: VoidFunction;
   isPlaying: boolean;
+  toggleFullScreen: VoidFunction;
 };
-export default function Controls({ onPlayChange, isPlaying }: Props) {
+export default function Controls({
+  onPlayChange,
+  toggleFullScreen,
+  isPlaying,
+}: Props) {
   return (
     <div className={styles.container}>
       <button title="Play" onClick={onPlayChange} type="button">
@@ -15,6 +20,7 @@ export default function Controls({ onPlayChange, isPlaying }: Props) {
         className={styles.fullScreenButton}
         type="button"
         title="Full screen"
+        onClick={toggleFullScreen}
       >
         <FullScreenIcon />
       </button>
