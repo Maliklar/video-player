@@ -55,7 +55,13 @@ export default function VideoPlayer() {
   }, []);
 
   useEffect(() => {}, []);
-
+  function progressChangeHandler(progress: number) {
+    setPercentage(progress);
+    const currentTime = videoRef.current?.currentTime;
+    const duration = videoRef.current?.duration;
+    if (duration && currentTime)
+      videoRef.current.currentTime = duration * (progress / 100);
+  }
   return (
     <div
       className={styles.container}
@@ -71,7 +77,10 @@ export default function VideoPlayer() {
         controlsList="nodownload nofullscreen noremoteplayback"
       />
       <div className={styles.footer}>
-        <Progress percentage={percentage} onProgressChange={() => {}} />
+        <Progress
+          percentage={percentage}
+          onProgressChange={progressChangeHandler}
+        />
         <Controls
           onPlayChange={togglePlaying}
           isPlaying={isPlaying}
