@@ -7,6 +7,9 @@
   object-fit: contain;
   overflow: hidden;
   border-radius: 8px;
+  &:focus {
+    outline: none;
+  }
 
   &[data-fullscreen="true"] {
     height: 100dvh;
@@ -56,5 +59,32 @@
       z-index: -1;
     }
     z-index: 1000000;
+  }
+}
+.ambientBg {
+  position: fixed;
+
+  filter: blur(100px);
+  &::after {
+    content: "";
+    display: block;
+    position: absolute;
+    height: 100%;
+    left: 0;
+    top: 0;
+    width: 100%;
+    z-index: 0;
+    box-shadow: inset 0px 0px 100px 120px rgb(15, 15, 15);
+  }
+  z-index: -1;
+
+  .ambientImage {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+    z-index: -1;
   }
 }

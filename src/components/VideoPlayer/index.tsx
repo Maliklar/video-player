@@ -2,13 +2,57 @@ import { useEffect, useRef, useState } from "react";
 import styles from "./index.module.scss";
 import Controls from "../Controls";
 import Progress from "../Progress";
-
+const canvas = document.createElement("canvas");
 export default function VideoPlayer() {
   const [isPlaying, setIsPlaying] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const ambientRef = useRef<HTMLDivElement>(null);
+  const imageRef = useRef<HTMLImageElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [percentage, setPercentage] = useState(0);
+
+  useEffect(() => {
+    console.log("KKK");
+    containerRef.current?.addEventListener("keydown", (e) => {
+      console.log(e.key);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!ambientRef.current || !containerRef.current || !videoRef.current)
+      return;
+    const { left, right, bottom, top } =
+      containerRef.current.getBoundingClientRect();
+    const width = right - left;
+    const height = bottom - top;
+    ambientRef.current.style.left = left - 100 + "px";
+    ambientRef.current.style.top = top - 100 + "px";
+    ambientRef.current.style.height = height + 200 + "px";
+    ambientRef.current.style.width = width + 200 + "px";
+
+    const interval = setInterval(() => {
+      if (!videoRef.current || !canvas || !imageRef.current) return;
+      canvas.width = videoRef.current.videoWidth / 10;
+      canvas.height = videoRef.current.videoHeight / 10;
+
+      canvas
+        .getContext("2d")
+        ?.drawImage(
+          videoRef.current,
+          0,
+          0,
+          videoRef.current.videoWidth / 10,
+          videoRef.current.videoHeight / 10
+        );
+
+      imageRef.current.src = canvas.toDataURL();
+    }, 50);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
 
   function toggleFullScreen() {
     if (isFullScreen) document.exitFullscreen();
@@ -64,6 +108,7 @@ export default function VideoPlayer() {
   }
   return (
     <div
+      tabIndex={0}
       className={styles.container}
       ref={containerRef}
       data-fullscreen={isFullScreen}
@@ -86,6 +131,9 @@ export default function VideoPlayer() {
           isPlaying={isPlaying}
           toggleFullScreen={toggleFullScreen}
         />
+      </div>
+      <div ref={ambientRef} className={styles.ambientBg}>
+        <img ref={imageRef} className={styles.ambientImage} alt="" />
       </div>
     </div>
   );
