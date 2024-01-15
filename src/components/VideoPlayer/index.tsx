@@ -2,7 +2,10 @@ import { useEffect, useRef, useState } from "react";
 import styles from "./index.module.scss";
 import Controls from "../Controls";
 import Progress from "../Progress";
+
 const canvas = document.createElement("canvas");
+const ambient = document.createElement("div");
+
 export default function VideoPlayer() {
   const [isPlaying, setIsPlaying] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -107,34 +110,36 @@ export default function VideoPlayer() {
       videoRef.current.currentTime = duration * (progress / 100);
   }
   return (
-    <div
-      tabIndex={0}
-      className={styles.container}
-      ref={containerRef}
-      data-fullscreen={isFullScreen}
-    >
-      <video
-        src="./test.mp4"
-        className={styles.video}
-        ref={videoRef}
-        controls={false}
-        data-fullscreen="true"
-        controlsList="nodownload nofullscreen noremoteplayback"
-      />
-      <div className={styles.footer}>
-        <Progress
-          percentage={percentage}
-          onProgressChange={progressChangeHandler}
+    <>
+      <div
+        tabIndex={0}
+        className={styles.container}
+        ref={containerRef}
+        data-fullscreen={isFullScreen}
+      >
+        <video
+          src="./test.mp4"
+          className={styles.video}
+          ref={videoRef}
+          controls={false}
+          data-fullscreen="true"
+          controlsList="nodownload nofullscreen noremoteplayback"
         />
-        <Controls
-          onPlayChange={togglePlaying}
-          isPlaying={isPlaying}
-          toggleFullScreen={toggleFullScreen}
-        />
+        <div className={styles.footer}>
+          <Progress
+            percentage={percentage}
+            onProgressChange={progressChangeHandler}
+          />
+          <Controls
+            onPlayChange={togglePlaying}
+            isPlaying={isPlaying}
+            toggleFullScreen={toggleFullScreen}
+          />
+        </div>
+        <div ref={ambientRef} className={styles.ambientBg}>
+          <img ref={imageRef} className={styles.ambientImage} alt="" />
+        </div>
       </div>
-      <div ref={ambientRef} className={styles.ambientBg}>
-        <img ref={imageRef} className={styles.ambientImage} alt="" />
-      </div>
-    </div>
+    </>
   );
 }

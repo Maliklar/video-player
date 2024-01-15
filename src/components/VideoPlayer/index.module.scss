@@ -62,7 +62,7 @@
   }
 }
 .ambientBg {
-  position: fixed;
+  position: absolute;
 
   filter: blur(100px);
   &::after {

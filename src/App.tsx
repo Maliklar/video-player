@@ -5,8 +5,21 @@ import VideoPlayer from "./components/VideoPlayer";
 function App() {
   return (
     <div className="App">
-      <VideoPlayer />
-      asdf
+      <div>asdf</div>
+
+      <div
+        style={{
+          display: "flex",
+          gap: "1rem",
+          alignItems: "center",
+        }}
+      >
+        <div>asdf</div>
+
+        <VideoPlayer />
+        <div>asdf</div>
+      </div>
+      <div>asdf</div>
     </div>
   );
 }
