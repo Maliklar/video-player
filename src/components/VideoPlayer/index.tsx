@@ -4,7 +4,6 @@ import Controls from "../Controls";
 import Progress from "../Progress";
 
 const canvas = document.createElement("canvas");
-const ambient = document.createElement("div");
 
 export default function VideoPlayer() {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -23,18 +22,17 @@ export default function VideoPlayer() {
   }, []);
 
   useEffect(() => {
-    if (!ambientRef.current || !containerRef.current || !videoRef.current)
-      return;
-    const { left, right, bottom, top } =
-      containerRef.current.getBoundingClientRect();
-    const width = right - left;
-    const height = bottom - top;
-    ambientRef.current.style.left = left - 100 + "px";
-    ambientRef.current.style.top = top - 100 + "px";
-    ambientRef.current.style.height = height + 200 + "px";
-    ambientRef.current.style.width = width + 200 + "px";
-
     const interval = setInterval(() => {
+      if (!ambientRef.current || !containerRef.current || !videoRef.current)
+        return;
+      const { left, right, bottom, top } =
+        containerRef.current.getBoundingClientRect();
+      const width = right - left;
+      const height = bottom - top;
+      ambientRef.current.style.left = left - 100 + "px";
+      ambientRef.current.style.top = top - 100 + "px";
+      ambientRef.current.style.height = height + 200 + "px";
+      ambientRef.current.style.width = width + 200 + "px";
       if (!videoRef.current || !canvas || !imageRef.current) return;
       canvas.width = videoRef.current.videoWidth / 10;
       canvas.height = videoRef.current.videoHeight / 10;
