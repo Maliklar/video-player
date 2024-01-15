@@ -136,9 +136,9 @@ export default function VideoPlayer() {
             toggleFullScreen={toggleFullScreen}
           />
         </div>
-        <div ref={ambientRef} className={styles.ambientBg}>
-          <img ref={imageRef} className={styles.ambientImage} alt="" />
-        </div>
+      </div>
+      <div ref={ambientRef} className={styles.ambientBg}>
+        <img ref={imageRef} className={styles.ambientImage} alt="" />
       </div>
     </>
   );
