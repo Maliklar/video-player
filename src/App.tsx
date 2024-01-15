@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import "./App.css";
 import VideoPlayer from "./components/VideoPlayer";
 

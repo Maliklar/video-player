@@ -12,7 +12,12 @@ export default function Controls({
 }: Props) {
   return (
     <div className={styles.container}>
-      <button title="Play" onClick={onPlayChange} type="button">
+      <button
+        title="Play"
+        onClick={onPlayChange}
+        className={styles.playButton}
+        type="button"
+      >
         <PlayIcon isPlaying={isPlaying} />
       </button>
       <div className={styles.timerContainer}></div>
