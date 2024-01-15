@@ -5,8 +5,10 @@
   @include flex();
   max-width: 500px;
   object-fit: contain;
+  overflow: hidden;
+  border-radius: 8px;
 
-  &[data-fullscreen="true"]{
+  &[data-fullscreen="true"] {
     height: 100dvh;
     width: 100dvw;
     position: fixed;
@@ -38,7 +40,21 @@
     display: flex;
     flex-direction: column;
     padding: 5px 8px;
-    background: linear-gradient(transparent, black);
+    box-shadow: 0px -30px 50px 0px rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(0.5px);
+
+    &::after {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      right: 0;
+      content: "";
+      display: block;
+      backdrop-filter: blur(1px);
+      box-shadow: inset 0px -60px 50px 0px rgba(0, 0, 0, 0.7);
+      z-index: -1;
+    }
     z-index: 1000000;
   }
 }

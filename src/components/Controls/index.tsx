@@ -43,3 +43,7 @@ function PlayIcon({ isPlaying = false }: PlayProps) {
 function FullScreenIcon() {
   return <div className={styles.fullScreenIcon}></div>;
 }
+
+function PauseIcon() {
+  return <div className={styles.pauseIcon}></div>;
+}

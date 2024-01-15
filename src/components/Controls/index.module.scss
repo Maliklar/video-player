@@ -7,14 +7,6 @@
   align-items: center;
   height: 100%;
   aspect-ratio: 1;
-  & > div {
-    transition: transform 0.3s;
-  }
-  &:hover {
-    & > div {
-      transform: scale(1.1);
-    }
-  }
 }
 
 .container {
@@ -40,11 +32,11 @@
 
 
 Play Icon
-
 **/
-
 .PlayIcon {
   position: relative;
+  display: flex;
+  justify-content: space-between;
   height: 0px;
   width: 0px;
   border: 14px white solid;
@@ -52,12 +44,66 @@ Play Icon
   border-bottom-color: transparent;
   border-right: transparent;
   border-left: 28px solid white;
-  border-radius: 3px;
-  transition: border 0.2s, transform 0.3s;
+  border-radius: 0px;
+  transition: border $animation-time, transform $animation-time,
+    width $animation-time, height $animation-time;
+  &::before {
+    display: block;
+    content: "";
+    height: 100%;
+    width: 30%;
+    background-color: white;
+    border-radius: 3px;
+  }
+  &::after {
+    display: block;
+    content: "";
+    height: 100%;
+    width: 30%;
+    background-color: white;
+    border-radius: 3px;
+  }
 
   &[data-playing="true"] {
-    border: 14px white solid;
+    border-width: 0px;
+    border-color: white;
+    border-color: transparent;
+    height: 28px;
+    width: 28px;
     transform: rotate(180deg);
+  }
+}
+
+/**
+
+
+
+
+
+
+
+Pause Icon
+
+*/
+.pauseIcon {
+  position: relative;
+  @include flex(space-between);
+  @include size(28px);
+  transition: all $animation-time;
+
+  &::before {
+    content: "";
+    height: 100%;
+    width: 30%;
+    background-color: white;
+    border-radius: 3px;
+  }
+  &::after {
+    content: "";
+    height: 100%;
+    width: 30%;
+    background-color: white;
+    border-radius: 3px;
   }
 }
 

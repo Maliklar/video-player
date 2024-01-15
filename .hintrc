@@ -9,7 +9,8 @@
       {
         "ignore": [
           "padding-inline",
-          "aspect-ratio"
+          "aspect-ratio",
+          "backdrop-filter"
         ]
       }
     ]
