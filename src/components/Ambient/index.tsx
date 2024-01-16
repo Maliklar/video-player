@@ -37,10 +37,10 @@ export default function Ambient({ enabled }: { enabled: boolean }) {
       clearTimeout(timer);
       timer = setTimeout(func, delay);
     }
-    const handler = (e?: Event | boolean) => {
+    function handler() {
       setScrolling(true);
       debounce(() => setScrolling(false), 1000);
-    };
+    }
 
     document.addEventListener("scroll", handler);
     return () => {

@@ -1,5 +1,7 @@
+import { ChangeEvent, useState } from "react";
 import formatTime from "../../utils/formatTime";
 import styles from "./index.module.scss";
+import useVideo from "../hooks/useVideo";
 
 type Props = {
   onPlayChange: VoidFunction;
@@ -13,6 +15,11 @@ export default function Controls({
   isPlaying,
   video,
 }: Props) {
+  const [volume, setVolume] = useState(0);
+  function volumeChangeHandler(e: ChangeEvent<HTMLInputElement>) {
+    setVolume(Number(e.target.value));
+    if (video?.volume) video.volume = Number(e.target.value) / 100;
+  }
   return (
     <div className={styles.container}>
       <button
@@ -24,6 +31,13 @@ export default function Controls({
         <PlayIcon isPlaying={isPlaying} />
       </button>
       <div className={styles.middle}>
+        <input
+          type="range"
+          min="1"
+          max="100"
+          onChange={volumeChangeHandler}
+          value={volume}
+        />
         <div className={styles.timerContainer}>
           {video?.currentTime && formatTime(video?.currentTime)}
         </div>
