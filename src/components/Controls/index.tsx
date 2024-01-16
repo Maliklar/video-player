@@ -15,11 +15,11 @@ export default function Controls({
   isPlaying,
   video,
 }: Props) {
-  const [volume, setVolume] = useState(0);
+  const { volume, changeVolume } = useVideo();
   function volumeChangeHandler(e: ChangeEvent<HTMLInputElement>) {
-    setVolume(Number(e.target.value));
-    if (video?.volume) video.volume = Number(e.target.value) / 100;
+    changeVolume(Number(e.target.value) / 100);
   }
+  console.log("LLLL", volume);
   return (
     <div className={styles.container}>
       <button
@@ -32,6 +32,7 @@ export default function Controls({
       </button>
       <div className={styles.middle}>
         <input
+          title="kkk"
           type="range"
           min="1"
           max="100"

@@ -9,12 +9,16 @@ enum VideoStatusEnum {
 }
 export const Context = React.createContext<VideoContextType>({
   status: VideoStatusEnum.Paused,
+  volume: 30,
+  changeVolume: (e: number) => {},
 });
 
 type VideoContextType = {
   container?: HTMLDivElement;
   video?: HTMLVideoElement;
   status: VideoStatusEnum;
+  volume: number;
+  changeVolume: (e: number) => void;
 };
 
 type Props = {
@@ -29,17 +33,61 @@ export default function VideoPlayer({ src, ambient = false }: Props) {
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [percentage, setPercentage] = useState(0);
   const [video, setVideo] = useState(videoRef.current);
+  const [volume, setVolume] = useState(30);
   const [container, setContainer] = useState(containerRef.current);
 
   useLayoutEffect(() => {
     setVideo(videoRef.current);
     setContainer(containerRef.current);
   }, []);
+
   useEffect(() => {
     containerRef.current?.addEventListener("keydown", (e) => {
-      console.log(e.key);
+      e.preventDefault();
+      if (e.code === "ArrowUp") volumeUp();
+      if (e.code === "ArrowDown") volumeDown();
+      if (e.code === "ArrowLeft") moveBackward();
+      if (e.code === "ArrowRight") moveForward();
+      if (e.code === "Space") pauseVideo();
+      if (e.code === "KeyF") toggleFullScreen();
     });
   }, []);
+
+  useEffect(() => {
+    if (!videoRef?.current) return;
+    function handler() {
+      console.log(Number(videoRef.current?.volume) * 100);
+      setVolume(Number(videoRef.current?.volume) * 100);
+    }
+    videoRef?.current?.addEventListener("volumechange", handler);
+
+    return () => {
+      videoRef?.current?.removeEventListener("volumechange", handler);
+    };
+  }, []);
+
+  function volumeUp() {
+    if (!videoRef.current) return;
+    videoRef.current.volume =
+      videoRef.current.volume + 0.05 <= 1 ? videoRef.current.volume + 0.05 : 1;
+  }
+  function volumeDown() {
+    if (!videoRef.current) return;
+    videoRef.current.volume =
+      videoRef.current.volume - 0.05 >= 0 ? videoRef.current.volume - 0.05 : 0;
+  }
+  function moveForward() {
+    if (!videoRef?.current) return;
+    videoRef.current.currentTime = videoRef.current.currentTime + 5;
+  }
+  function moveBackward() {
+    if (!videoRef?.current) return;
+    videoRef.current.currentTime = videoRef.current.currentTime - 5;
+  }
+  function pauseVideo() {}
+  function changeVolume(value: number) {
+    setVolume(value * 100);
+  }
 
   function toggleFullScreen() {
     if (isFullScreen) document.exitFullscreen();
@@ -98,6 +146,8 @@ export default function VideoPlayer({ src, ambient = false }: Props) {
         container: container || undefined,
         video: video || undefined,
         status: VideoStatusEnum.Playing,
+        volume,
+        changeVolume,
       }}
     >
       <div

@@ -7,12 +7,14 @@ type Props = {
 };
 export default function Progress({ percentage, onProgressChange }: Props) {
   function progressChangeHandler(e: ChangeEvent<HTMLInputElement>) {
-    onProgressChange(Number(e.target.value) / 100);
+    console.log(e.target.value);
+    onProgressChange(Number(e.target.value) / 10);
   }
 
   return (
     <div className={styles.progressContainer}>
       <input
+        title="d"
         className={styles.container}
         type="range"
         onChange={progressChangeHandler}
