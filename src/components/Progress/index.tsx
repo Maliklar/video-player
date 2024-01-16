@@ -1,26 +1,25 @@
 import { ChangeEvent } from "react";
 import styles from "./index.module.scss";
+import useVideo from "../hooks/useVideo";
 
-type Props = {
-  percentage: number;
-  onProgressChange: (percent: number) => void;
-};
-export default function Progress({ percentage, onProgressChange }: Props) {
+export default function Progress() {
+  const { progress, video, changeProgress } = useVideo();
   function progressChangeHandler(e: ChangeEvent<HTMLInputElement>) {
-    console.log(e.target.value);
-    onProgressChange(Number(e.target.value) / 10);
+    changeProgress(Number(e.target.value));
   }
 
+  if (!video) return null;
   return (
     <div className={styles.progressContainer}>
       <input
-        title="d"
-        className={styles.container}
+        title="Progress Bar"
+        className={styles.progress}
         type="range"
         onChange={progressChangeHandler}
-        value={percentage * 100}
+        value={progress}
         min={0}
-        max={10000}
+        step="1"
+        max={video.duration}
       />
     </div>
   );

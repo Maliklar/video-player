@@ -15,11 +15,10 @@ export default function Controls({
   isPlaying,
   video,
 }: Props) {
-  const { volume, changeVolume } = useVideo();
+  const { volume, progress, changeVolume } = useVideo();
   function volumeChangeHandler(e: ChangeEvent<HTMLInputElement>) {
-    changeVolume(Number(e.target.value) / 100);
+    changeVolume(Number(e.target.value));
   }
-  console.log("LLLL", volume);
   return (
     <div className={styles.container}>
       <button
@@ -34,14 +33,13 @@ export default function Controls({
         <input
           title="kkk"
           type="range"
-          min="1"
-          max="100"
+          min="0"
+          step="0.01"
+          max="1"
           onChange={volumeChangeHandler}
           value={volume}
         />
-        <div className={styles.timerContainer}>
-          {video?.currentTime && formatTime(video?.currentTime)}
-        </div>
+        <div className={styles.timerContainer}>{formatTime(progress)}</div>
       </div>
       <button
         className={styles.fullScreenButton}

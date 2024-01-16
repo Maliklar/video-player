@@ -9,8 +9,10 @@ enum VideoStatusEnum {
 }
 export const Context = React.createContext<VideoContextType>({
   status: VideoStatusEnum.Paused,
-  volume: 30,
+  volume: 0.3,
+  progress: 0,
   changeVolume: (e: number) => {},
+  changeProgress: (e: number) => {},
 });
 
 type VideoContextType = {
@@ -18,7 +20,9 @@ type VideoContextType = {
   video?: HTMLVideoElement;
   status: VideoStatusEnum;
   volume: number;
+  progress: number;
   changeVolume: (e: number) => void;
+  changeProgress: (e: number) => void;
 };
 
 type Props = {
@@ -31,15 +35,16 @@ export default function VideoPlayer({ src, ambient = false }: Props) {
 
   const containerRef = useRef<HTMLDivElement>(null);
   const [isFullScreen, setIsFullScreen] = useState(false);
-  const [percentage, setPercentage] = useState(0);
+  const [progress, setProgress] = useState(0);
   const [video, setVideo] = useState(videoRef.current);
-  const [volume, setVolume] = useState(30);
+  const [volume, setVolume] = useState(0.3);
   const [container, setContainer] = useState(containerRef.current);
 
   useLayoutEffect(() => {
     setVideo(videoRef.current);
     setContainer(containerRef.current);
-  }, []);
+    if (videoRef.current) videoRef.current.volume = volume;
+  }, [volume]);
 
   useEffect(() => {
     containerRef.current?.addEventListener("keydown", (e) => {
@@ -56,13 +61,14 @@ export default function VideoPlayer({ src, ambient = false }: Props) {
   useEffect(() => {
     if (!videoRef?.current) return;
     function handler() {
-      console.log(Number(videoRef.current?.volume) * 100);
-      setVolume(Number(videoRef.current?.volume) * 100);
+      if (!videoRef?.current?.volume) return;
+      setVolume(videoRef.current.volume);
     }
-    videoRef?.current?.addEventListener("volumechange", handler);
+    videoRef?.current.addEventListener("volumechange", handler);
 
     return () => {
-      videoRef?.current?.removeEventListener("volumechange", handler);
+      if (!videoRef?.current) return;
+      videoRef.current.removeEventListener("volumechange", handler);
     };
   }, []);
 
@@ -86,7 +92,7 @@ export default function VideoPlayer({ src, ambient = false }: Props) {
   }
   function pauseVideo() {}
   function changeVolume(value: number) {
-    setVolume(value * 100);
+    setVolume(value);
   }
 
   function toggleFullScreen() {
@@ -101,6 +107,13 @@ export default function VideoPlayer({ src, ambient = false }: Props) {
     });
   }
 
+  useEffect(() => {
+    containerRef.current?.addEventListener("dblclick", toggleFullScreen);
+    return () => {
+      containerRef.current?.removeEventListener("dblclick", toggleFullScreen);
+    };
+  }, []);
+
   // Percentage Change Handler
   useEffect(() => {
     if (!isPlaying) return;
@@ -108,7 +121,7 @@ export default function VideoPlayer({ src, ambient = false }: Props) {
       const currentTime = videoRef.current?.currentTime;
       const duration = videoRef.current?.duration;
       if (!currentTime || !duration || !isPlaying) return;
-      setPercentage((currentTime / duration) * 100);
+      // setPercentage((currentTime / duration) * 100);
     });
 
     return () => {
@@ -133,21 +146,32 @@ export default function VideoPlayer({ src, ambient = false }: Props) {
     };
   }, []);
 
-  function progressChangeHandler(progress: number) {
-    setPercentage(progress);
+  function changeProgress(value: number) {
+    setProgress(value);
     const currentTime = videoRef.current?.currentTime;
     const duration = videoRef.current?.duration;
-    if (duration && currentTime)
-      videoRef.current.currentTime = duration * (progress / 100);
+    if (duration && currentTime) videoRef.current.currentTime = value;
   }
+
+  useEffect(() => {
+    const timeout = setInterval(() => {
+      if (videoRef.current) setProgress(videoRef.current?.currentTime);
+    }, 1000);
+    return () => {
+      clearInterval(timeout);
+    };
+  }, []);
+
   return (
     <Context.Provider
       value={{
         container: container || undefined,
         video: video || undefined,
         status: VideoStatusEnum.Playing,
+        progress,
         volume,
         changeVolume,
+        changeProgress,
       }}
     >
       <div
@@ -164,10 +188,7 @@ export default function VideoPlayer({ src, ambient = false }: Props) {
           controlsList="nodownload nofullscreen noremoteplayback"
         />
         <div className={styles.footer}>
-          <Progress
-            percentage={percentage}
-            onProgressChange={progressChangeHandler}
-          />
+          <Progress />
           <Controls
             onPlayChange={togglePlaying}
             isPlaying={isPlaying}
