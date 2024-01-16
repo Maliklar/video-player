@@ -1,7 +1,13 @@
 .container {
   position: fixed;
-  transition: all 0.1s;
   filter: blur(20px);
+  z-index: -1;
+
+  &[data-scrolling="true"] {
+    &::after {
+      box-shadow: inset 0px 0px 500px 1000px rgb(18, 18, 18);
+    }
+  }
 
   &::after {
     content: "";
@@ -11,16 +17,11 @@
     left: 0;
     top: 0;
     width: 100%;
-    z-index: 0;
+    z-index: -1;
     box-shadow: inset 0px 0px 500px 300px rgb(18, 18, 18);
-    transition: all 3s;
+    transition: box-shadow 10s;
   }
-  z-index: -1;
-  &[data-scrolling="true"] {
-    &::after {
-      box-shadow: inset 0px 0px 500px 1000px rgb(18, 18, 18);
-    }
-  }
+
   .ambientImage {
     position: absolute;
     left: 0;

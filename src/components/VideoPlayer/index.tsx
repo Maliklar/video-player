@@ -111,7 +111,6 @@ export default function VideoPlayer({ src, ambient = false }: Props) {
           className={styles.video}
           ref={videoRef}
           controls={false}
-          data-fullscreen="true"
           controlsList="nodownload nofullscreen noremoteplayback"
         />
         <div className={styles.footer}>

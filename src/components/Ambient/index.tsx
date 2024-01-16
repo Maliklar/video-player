@@ -7,11 +7,9 @@ export default function Ambient({ enabled }: { enabled: boolean }) {
   const ambientRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { container, video } = useVideo();
-
+  const ambient = ambientRef.current;
+  const canvas = canvasRef.current;
   useEffect(() => {
-    const ambient = ambientRef.current;
-    const canvas = canvasRef.current;
-
     if (!enabled) return;
 
     const interval = setInterval(() => {
@@ -21,32 +19,32 @@ export default function Ambient({ enabled }: { enabled: boolean }) {
       ambient.style.top = top - height / 2 + "px";
       ambient.style.height = height * 2 + "px";
       ambient.style.width = width * 2 + "px";
-      if (!video) return;
       canvas.width = video.videoWidth / 10;
       canvas.height = video.videoHeight / 10;
-
       canvas
         .getContext("2d")
         ?.drawImage(video, 0, 0, video.videoWidth / 10, video.videoHeight / 10);
-    }, 100);
+    }, 50);
 
     return () => {
       clearInterval(interval);
     };
-  }, [container, enabled, video]);
+  }, [ambient, canvas, container, enabled, video]);
 
   useEffect(() => {
+    let timer: NodeJS.Timeout;
+    function debounce(func: () => void, delay: number) {
+      clearTimeout(timer);
+      timer = setTimeout(func, delay);
+    }
     const handler = (e?: Event | boolean) => {
       setScrolling(true);
+      debounce(() => setScrolling(false), 1000);
     };
-    const scrollEnd = () => {
-      setScrolling(false);
-    };
+
     document.addEventListener("scroll", handler);
-    document.addEventListener("scrollend", scrollEnd);
     return () => {
       document.removeEventListener("scroll", handler);
-      document.removeEventListener("scrollend", scrollEnd);
     };
   }, []);
 
