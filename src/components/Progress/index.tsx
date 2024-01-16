@@ -1,60 +1,25 @@
-import React, { useEffect, useRef } from "react";
+import { ChangeEvent } from "react";
 import styles from "./index.module.scss";
 
-type ClickEvent = React.MouseEvent<HTMLDivElement, MouseEvent>;
 type Props = {
   percentage: number;
   onProgressChange: (percent: number) => void;
 };
 export default function Progress({ percentage, onProgressChange }: Props) {
-  const style: React.CSSProperties = { width: `${percentage}%` };
-  const dragging = useRef(false);
-  const progressWidth = useRef(0);
-  const cursorPosition = useRef(0);
-  const progressRect = useRef<DOMRect>();
-  const clientPosition = useRef<{
-    clientX: number;
-    clientY: number;
-  }>();
-
-  function progressClickHandler({ currentTarget, clientX }: ClickEvent) {
-    progressRect.current = currentTarget.getBoundingClientRect();
-    const { left, right } = currentTarget.getBoundingClientRect();
-    progressWidth.current = right - left;
-    cursorPosition.current = clientX - left;
-    const percent = (cursorPosition.current / progressWidth.current) * 100;
-    onProgressChange(percent);
-    dragging.current = true;
+  function progressChangeHandler(e: ChangeEvent<HTMLInputElement>) {
+    onProgressChange(Number(e.target.value) / 100);
   }
 
-  useEffect(() => {
-    function mouseMoveHandler({ clientX, clientY }: MouseEvent) {
-      if (!dragging.current || !progressRect.current?.left) return;
-      clientPosition.current = { clientX, clientY };
-      cursorPosition.current = clientX - progressRect.current.left;
-      const percent = (cursorPosition.current / progressWidth.current) * 100;
-      onProgressChange(percent);
-    }
-    function mouseUpHandler() {
-      dragging.current = false;
-    }
-    document.addEventListener("mousemove", mouseMoveHandler);
-    document.addEventListener("mouseup", mouseUpHandler);
-    return () => {
-      document.removeEventListener("mousemove", mouseMoveHandler);
-      document.removeEventListener("mouseup", mouseUpHandler);
-    };
-  }, [onProgressChange]);
-
   return (
-    <div
-      className={styles.progressContainer}
-      onMouseDown={progressClickHandler}
-    >
-      <div className={styles.background} />
-      <div className={styles.container} style={style}>
-        <div className={styles.progressIndicator} />
-      </div>
+    <div className={styles.progressContainer}>
+      <input
+        className={styles.container}
+        type="range"
+        onChange={progressChangeHandler}
+        value={percentage * 100}
+        min={0}
+        max={10000}
+      />
     </div>
   );
 }
