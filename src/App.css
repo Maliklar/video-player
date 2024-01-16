@@ -2,8 +2,9 @@
   text-align: center;
   display: flex;
   flex-direction: column;
+  justify-content: center;
   color: white;
-  height: 5000px;
+  min-height: 5000px;
 }
 
 .App-logo {

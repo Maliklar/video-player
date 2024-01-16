@@ -16,7 +16,7 @@ function App() {
       >
         <div>asdf</div>
 
-        <VideoPlayer src="/test.mp4" />
+        <VideoPlayer src="/test.mp4" ambient />
         <div>asdf</div>
       </div>
       <div>asdf</div>

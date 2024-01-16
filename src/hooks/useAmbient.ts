@@ -1,4 +1,4 @@
-import useVideo from "../context/useVideo";
+import useVideo from "../components/hooks/useVideo";
 
 export default function useAmbient() {
   const video = useVideo();

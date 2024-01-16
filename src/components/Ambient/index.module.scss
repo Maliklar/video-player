@@ -1,0 +1,29 @@
+.container {
+  position: fixed;
+  transition: all 0.08s;
+
+  filter: blur(20px);
+  &::after {
+    content: "";
+    display: block;
+    position: absolute;
+    height: 100%;
+    left: 0;
+    top: 0;
+    width: 100%;
+    z-index: 0;
+
+    box-shadow: inset 0px 0px 500px 300px rgb(18, 18, 18);
+  }
+  z-index: -1;
+
+  .ambientImage {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+    z-index: -1;
+  }
+}
