@@ -23,8 +23,10 @@ export default function Controls({
       >
         <PlayIcon isPlaying={isPlaying} />
       </button>
-      <div className={styles.timerContainer}>
-        {video?.currentTime && formatTime(video?.currentTime)}
+      <div className={styles.middle}>
+        <div className={styles.timerContainer}>
+          {video?.currentTime && formatTime(video?.currentTime)}
+        </div>
       </div>
       <button
         className={styles.fullScreenButton}
@@ -49,6 +51,6 @@ function FullScreenIcon() {
   return <div className={styles.fullScreenIcon}></div>;
 }
 
-function PauseIcon() {
-  return <div className={styles.pauseIcon}></div>;
-}
+// function PauseIcon() {
+//   return <div className={styles.pauseIcon}></div>;
+// }

@@ -16,9 +16,7 @@ export default function Ambient({ enabled }: { enabled: boolean }) {
 
     const interval = setInterval(() => {
       if (!ambient || !container || !canvas || !video) return;
-      const { left, right, bottom, top, y, height, width } =
-        container.getBoundingClientRect();
-      console.log(top, y);
+      const { left, top, height, width } = container.getBoundingClientRect();
       ambient.style.left = left - width / 2 + "px";
       ambient.style.top = top - height / 2 + "px";
       ambient.style.height = height * 2 + "px";
