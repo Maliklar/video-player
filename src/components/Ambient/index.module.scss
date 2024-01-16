@@ -1,8 +1,8 @@
 .container {
   position: fixed;
-  transition: all 0.08s;
-
+  transition: all 0.1s;
   filter: blur(20px);
+
   &::after {
     content: "";
     display: block;
@@ -12,11 +12,15 @@
     top: 0;
     width: 100%;
     z-index: 0;
-
     box-shadow: inset 0px 0px 500px 300px rgb(18, 18, 18);
+    transition: all 3s;
   }
   z-index: -1;
-
+  &[data-scrolling="true"] {
+    &::after {
+      box-shadow: inset 0px 0px 500px 1000px rgb(18, 18, 18);
+    }
+  }
   .ambientImage {
     position: absolute;
     left: 0;
