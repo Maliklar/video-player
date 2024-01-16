@@ -1,14 +1,17 @@
+import formatTime from "../../utils/formatTime";
 import styles from "./index.module.scss";
 
 type Props = {
   onPlayChange: VoidFunction;
   isPlaying: boolean;
   toggleFullScreen: VoidFunction;
+  video: HTMLVideoElement | null;
 };
 export default function Controls({
   onPlayChange,
   toggleFullScreen,
   isPlaying,
+  video,
 }: Props) {
   return (
     <div className={styles.container}>
@@ -20,7 +23,9 @@ export default function Controls({
       >
         <PlayIcon isPlaying={isPlaying} />
       </button>
-      <div className={styles.timerContainer}></div>
+      <div className={styles.timerContainer}>
+        {video?.currentTime && formatTime(video?.currentTime)}
+      </div>
       <button
         className={styles.fullScreenButton}
         type="button"

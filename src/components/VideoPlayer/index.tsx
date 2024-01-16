@@ -1,11 +1,23 @@
-import { useEffect, useRef, useState } from "react";
+import {
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import styles from "./index.module.scss";
 import Controls from "../Controls";
 import Progress from "../Progress";
+import VideoContext from "../../context";
+import useVideo from "../../context/useVideo";
 
 const canvas = document.createElement("canvas");
 
-export default function VideoPlayer() {
+type Props = {
+  src: string;
+  ambient?: boolean;
+};
+export default function VideoPlayer({ src, ambient }: Props) {
   const [isPlaying, setIsPlaying] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const ambientRef = useRef<HTMLDivElement>(null);
@@ -13,9 +25,19 @@ export default function VideoPlayer() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [percentage, setPercentage] = useState(0);
+  const { setElements } = useVideo();
 
   useEffect(() => {
-    console.log("KKK");
+    if (!ambientRef.current || !videoRef.current || !containerRef.current)
+      return;
+    setElements({
+      ambientElement: ambientRef.current,
+      videoElement: videoRef.current,
+      containerElement: containerRef.current,
+    });
+  }, [setElements]);
+
+  useEffect(() => {
     containerRef.current?.addEventListener("keydown", (e) => {
       console.log(e.key);
     });
@@ -108,36 +130,39 @@ export default function VideoPlayer() {
       videoRef.current.currentTime = duration * (progress / 100);
   }
   return (
-    <>
-      <div
-        tabIndex={0}
-        className={styles.container}
-        ref={containerRef}
-        data-fullscreen={isFullScreen}
-      >
-        <video
-          src="./test.mp4"
-          className={styles.video}
-          ref={videoRef}
-          controls={false}
-          data-fullscreen="true"
-          controlsList="nodownload nofullscreen noremoteplayback"
-        />
-        <div className={styles.footer}>
-          <Progress
-            percentage={percentage}
-            onProgressChange={progressChangeHandler}
+    <VideoContext>
+      <>
+        <div
+          tabIndex={0}
+          className={styles.container}
+          ref={containerRef}
+          data-fullscreen={isFullScreen}
+        >
+          <video
+            src={src}
+            className={styles.video}
+            ref={videoRef}
+            controls={false}
+            data-fullscreen="true"
+            controlsList="nodownload nofullscreen noremoteplayback"
           />
-          <Controls
-            onPlayChange={togglePlaying}
-            isPlaying={isPlaying}
-            toggleFullScreen={toggleFullScreen}
-          />
+          <div className={styles.footer}>
+            <Progress
+              percentage={percentage}
+              onProgressChange={progressChangeHandler}
+            />
+            <Controls
+              onPlayChange={togglePlaying}
+              isPlaying={isPlaying}
+              video={videoRef.current}
+              toggleFullScreen={toggleFullScreen}
+            />
+          </div>
         </div>
-      </div>
-      <div ref={ambientRef} className={styles.ambientBg}>
-        <img ref={imageRef} className={styles.ambientImage} alt="" />
-      </div>
-    </>
+        <div ref={ambientRef} className={styles.ambientBg}>
+          <img ref={imageRef} className={styles.ambientImage} alt="" />
+        </div>
+      </>
+    </VideoContext>
   );
 }

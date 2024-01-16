@@ -34,7 +34,6 @@ export default function Progress({ percentage, onProgressChange }: Props) {
       cursorPosition.current = clientX - progressRect.current.left;
       const percent = (cursorPosition.current / progressWidth.current) * 100;
       onProgressChange(percent);
-      console.log(percent);
     }
     function mouseUpHandler() {
       dragging.current = false;
