@@ -2,7 +2,9 @@ import { ChangeEvent, useState } from "react";
 import formatTime from "../../utils/formatTime";
 import styles from "./index.module.scss";
 import useVideo from "../hooks/useVideo";
-
+import VolumeMin from "../../assets/volume-min.svg";
+import VolumeMax from "../../assets/volume-max.svg";
+import VolumeMute from "../../assets/volume-mute.svg";
 type Props = {
   onPlayChange: VoidFunction;
   isPlaying: boolean;
@@ -30,15 +32,34 @@ export default function Controls({
         <PlayIcon isPlaying={isPlaying} />
       </button>
       <div className={styles.middle}>
-        <input
-          title="kkk"
-          type="range"
-          min="0"
-          step="0.01"
-          max="1"
-          onChange={volumeChangeHandler}
-          value={volume}
-        />
+        <div className={styles.volumeController}>
+          <button
+            type="button"
+            className={styles.muteButton}
+            title="Mute/Unmute button"
+          >
+            <img
+              src={
+                volume >= 0.5
+                  ? VolumeMax
+                  : volume === 0
+                  ? VolumeMute
+                  : VolumeMin
+              }
+              alt="Volume Up"
+            />
+          </button>
+          <input
+            className={styles.volumeSlider}
+            title="Volume"
+            type="range"
+            min="0"
+            step="0.01"
+            max="1"
+            onChange={volumeChangeHandler}
+            value={volume}
+          />
+        </div>
         <div className={styles.timerContainer}>{formatTime(progress)}</div>
       </div>
       <button

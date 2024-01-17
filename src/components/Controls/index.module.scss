@@ -19,6 +19,8 @@
   @include flex(space-between);
   padding: 0rem 0.5rem;
   gap: 0.5rem;
+  width: 100%;
+  height: 50px;
   .middle {
     position: relative;
     align-items: center;
@@ -27,9 +29,56 @@
     height: 100%;
     gap: 1rem;
   }
+  .volumeController {
+    position: relative;
+    display: flex;
+    align-items: center;
+    transition: transform 0.3s, width 0.3s;
+    .muteButton {
+      position: relative;
+      height: 32px;
+      width: 32px;
+      padding: 0px;
+      img {
+        height: inherit;
+        width: inherit;
+      }
+    }
+    &:hover {
+      .volumeSlider {
+        transform: scale(1);
+        width: 100px;
+        &::-webkit-slider-thumb {
+          appearance: none;
+          transform: scale(1);
+          border-radius: 100%;
+        }
+      }
+    }
+    .volumeSlider {
+      appearance: none;
+      position: relative;
+      background-color: white;
+      border-radius: 100px;
+      height: 10px;
+      width: 0px;
+      transition: transform 0.3s, width 0.3s;
+      transform: scale(0);
 
-  width: 100%;
-  height: 50px;
+      cursor: pointer;
+
+      &::-webkit-slider-thumb {
+        appearance: none;
+        height: 20px;
+        width: 20px;
+        transform: scale(0);
+        border-radius: 100%;
+        transition: transform 0.3s;
+
+        background-color: white;
+      }
+    }
+  }
 
   .playButton {
     @include controlButtonMixin();
