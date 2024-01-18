@@ -24,6 +24,7 @@ export const Context = React.createContext<VideoContextType>({
   toggleFullScreen: () => {},
   focusVolume: false,
   focusProgress: false,
+  isFullScreen: false,
 });
 
 type VideoContextType = {
@@ -38,6 +39,7 @@ type VideoContextType = {
   toggleFullScreen: () => void;
   focusVolume: boolean;
   focusProgress: boolean;
+  isFullScreen: boolean;
 };
 
 type Props = {
@@ -136,7 +138,6 @@ export default function VideoPlayer({
   useEffect(() => {
     function handler(e: globalThis.KeyboardEvent) {
       e.preventDefault();
-      console.log(e.code);
       switch (e.code) {
         case "ArrowUp":
           volumeUp();
@@ -163,7 +164,6 @@ export default function VideoPlayer({
       }
     }
     container?.addEventListener("keydown", handler);
-    console.log("TRIGGERED");
     return () => {
       container?.removeEventListener("keydown", handler);
     };
@@ -237,6 +237,7 @@ export default function VideoPlayer({
         toggleFullScreen,
         focusVolume,
         focusProgress,
+        isFullScreen,
       }}
     >
       <div

@@ -1,10 +1,14 @@
-import { ChangeEvent, useState } from "react";
-import formatTime from "../../utils/formatTime";
-import styles from "./index.module.scss";
-import useVideo from "../hooks/useVideo";
-import VolumeMin from "../../assets/volume-min.svg";
+import { ChangeEvent } from "react";
 import VolumeMax from "../../assets/volume-max.svg";
+import VolumeMin from "../../assets/volume-min.svg";
 import VolumeMute from "../../assets/volume-mute.svg";
+import FullScreenMin from "../../assets/fullscreen-min.svg";
+import FullScreen from "../../assets/fullscreen.svg";
+import Play from "../../assets/play.svg";
+import Pause from "../../assets/pause.svg";
+import formatTime from "../../utils/formatTime";
+import useVideo from "../hooks/useVideo";
+import styles from "./index.module.scss";
 type Props = {
   onPlayChange: VoidFunction;
   isPlaying: boolean;
@@ -17,7 +21,8 @@ export default function Controls({
   isPlaying,
   video,
 }: Props) {
-  const { volume, focusVolume, progress, changeVolume } = useVideo();
+  const { volume, focusVolume, isFullScreen, progress, changeVolume } =
+    useVideo();
   function volumeChangeHandler(e: ChangeEvent<HTMLInputElement>) {
     changeVolume(Number(e.target.value));
   }
@@ -30,7 +35,11 @@ export default function Controls({
         className={styles.playButton}
         type="button"
       >
-        <PlayIcon isPlaying={isPlaying} />
+        <img
+          className={styles.iconImage}
+          src={isPlaying ? Play : Pause}
+          alt="Toggle Play"
+        />
       </button>
       <div className={styles.middle}>
         <div data-focus={focusVolume} className={styles.volumeController}>
@@ -40,6 +49,7 @@ export default function Controls({
             title="Mute/Unmute button"
           >
             <img
+              className={styles.iconImage}
               src={
                 volume >= 0.5
                   ? VolumeMax
@@ -74,22 +84,26 @@ export default function Controls({
         title="Full screen"
         onClick={toggleFullScreen}
       >
-        <FullScreenIcon />
+        <img
+          className={styles.iconImage}
+          src={isFullScreen ? FullScreenMin : FullScreen}
+          alt="Toggle Fullscreen"
+        />
       </button>
     </div>
   );
 }
 
-type PlayProps = {
-  isPlaying: boolean;
-};
-function PlayIcon({ isPlaying = false }: PlayProps) {
-  return <div className={styles.PlayIcon} data-playing={isPlaying} />;
-}
+// type PlayProps = {
+//   isPlaying: boolean;
+// };
+// function PlayIcon({ isPlaying = false }: PlayProps) {
+//   return <div className={styles.PlayIcon} data-playing={isPlaying} />;
+// }
 
-function FullScreenIcon() {
-  return <div className={styles.fullScreenIcon}></div>;
-}
+// function FullScreenIcon() {
+//   return <div className={styles.fullScreenIcon}></div>;
+// }
 
 // function PauseIcon() {
 //   return <div className={styles.pauseIcon}></div>;
