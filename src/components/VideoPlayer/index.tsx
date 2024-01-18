@@ -3,6 +3,7 @@ import Ambient from "../Ambient";
 import Controls from "../Controls";
 import Progress from "../Progress";
 import styles from "./index.module.scss";
+import debounce from "../../utils/debounce";
 enum VideoStatusEnum {
   Playing,
   Paused,
@@ -13,6 +14,10 @@ export const Context = React.createContext<VideoContextType>({
   progress: 0,
   changeVolume: (e: number) => {},
   changeProgress: (e: number) => {},
+  togglePlay: () => {},
+  toggleFullScreen: () => {},
+  focusVolume: false,
+  focusProgress: false,
 });
 
 type VideoContextType = {
@@ -23,6 +28,10 @@ type VideoContextType = {
   progress: number;
   changeVolume: (e: number) => void;
   changeProgress: (e: number) => void;
+  togglePlay: () => void;
+  toggleFullScreen: () => void;
+  focusVolume: boolean;
+  focusProgress: boolean;
 };
 
 type Props = {
@@ -39,6 +48,8 @@ export default function VideoPlayer({ src, ambient = false }: Props) {
   const [video, setVideo] = useState(videoRef.current);
   const [volume, setVolume] = useState(0.3);
   const [container, setContainer] = useState(containerRef.current);
+  const [focusVolume, setFocusVolume] = useState(false);
+  const [focusProgress, setFocusProgress] = useState(false);
 
   useLayoutEffect(() => {
     setVideo(videoRef.current);
@@ -74,26 +85,31 @@ export default function VideoPlayer({ src, ambient = false }: Props) {
 
   function volumeUp() {
     if (!videoRef.current) return;
-    videoRef.current.volume =
-      videoRef.current.volume + 0.05 <= 1 ? videoRef.current.volume + 0.05 : 1;
+    changeVolume(
+      videoRef.current.volume + 0.05 <= 1 ? videoRef.current.volume + 0.05 : 1
+    );
   }
   function volumeDown() {
     if (!videoRef.current) return;
-    videoRef.current.volume =
-      videoRef.current.volume - 0.05 >= 0 ? videoRef.current.volume - 0.05 : 0;
+    changeVolume(
+      videoRef.current.volume - 0.05 >= 0 ? videoRef.current.volume - 0.05 : 0
+    );
   }
   function moveForward() {
     if (!videoRef?.current) return;
-    videoRef.current.currentTime = videoRef.current.currentTime + 5;
+    changeProgress(videoRef.current.currentTime + 5);
   }
   function moveBackward() {
     if (!videoRef?.current) return;
-    videoRef.current.currentTime = videoRef.current.currentTime - 5;
+    changeProgress(videoRef.current.currentTime - 5);
   }
   function pauseVideo() {}
   function changeVolume(value: number) {
     setVolume(value);
+    setFocusVolume(true);
+    debounce(() => setFocusVolume(false), 3000);
   }
+  function togglePlay() {}
 
   function toggleFullScreen() {
     if (isFullScreen) document.exitFullscreen();
@@ -107,27 +123,6 @@ export default function VideoPlayer({ src, ambient = false }: Props) {
     });
   }
 
-  useEffect(() => {
-    containerRef.current?.addEventListener("dblclick", toggleFullScreen);
-    return () => {
-      containerRef.current?.removeEventListener("dblclick", toggleFullScreen);
-    };
-  }, []);
-
-  // Percentage Change Handler
-  useEffect(() => {
-    if (!isPlaying) return;
-    const interval = setInterval(() => {
-      const currentTime = videoRef.current?.currentTime;
-      const duration = videoRef.current?.duration;
-      if (!currentTime || !duration || !isPlaying) return;
-      // setPercentage((currentTime / duration) * 100);
-    });
-
-    return () => {
-      clearInterval(interval);
-    };
-  }, [isPlaying]);
   // Playing Change Handler
   useEffect(() => {
     if (!videoRef.current) return;
@@ -147,10 +142,13 @@ export default function VideoPlayer({ src, ambient = false }: Props) {
   }, []);
 
   function changeProgress(value: number) {
+    if (!videoRef.current?.duration) return;
+    if (value < 0 || value > videoRef.current?.duration) return;
     setProgress(value);
-    const currentTime = videoRef.current?.currentTime;
+    setFocusProgress(true);
+    debounce(() => setFocusProgress(false), 3000);
     const duration = videoRef.current?.duration;
-    if (duration && currentTime) videoRef.current.currentTime = value;
+    if (duration) videoRef.current.currentTime = value;
   }
 
   useEffect(() => {
@@ -172,6 +170,10 @@ export default function VideoPlayer({ src, ambient = false }: Props) {
         volume,
         changeVolume,
         changeProgress,
+        togglePlay,
+        toggleFullScreen,
+        focusVolume,
+        focusProgress,
       }}
     >
       <div
@@ -184,6 +186,7 @@ export default function VideoPlayer({ src, ambient = false }: Props) {
           src={src}
           className={styles.video}
           ref={videoRef}
+          onDoubleClick={toggleFullScreen}
           controls={false}
           controlsList="nodownload nofullscreen noremoteplayback"
         />

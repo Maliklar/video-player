@@ -26,6 +26,18 @@
     cursor: pointer;
   }
 
+  &[data-focus="true"] {
+    & > * {
+      height: 100%;
+    }
+    .container {
+      height: 100%;
+      .progressIndicator {
+        box-shadow: 0px 0px 5px black;
+        margin-inline-end: -0.9em;
+      }
+    }
+  }
   &:hover {
     & > * {
       height: 100%;

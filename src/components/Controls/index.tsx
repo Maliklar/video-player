@@ -17,10 +17,11 @@ export default function Controls({
   isPlaying,
   video,
 }: Props) {
-  const { volume, progress, changeVolume } = useVideo();
+  const { volume, focusVolume, progress, changeVolume } = useVideo();
   function volumeChangeHandler(e: ChangeEvent<HTMLInputElement>) {
     changeVolume(Number(e.target.value));
   }
+
   return (
     <div className={styles.container}>
       <button
@@ -32,7 +33,7 @@ export default function Controls({
         <PlayIcon isPlaying={isPlaying} />
       </button>
       <div className={styles.middle}>
-        <div className={styles.volumeController}>
+        <div data-focus={focusVolume} className={styles.volumeController}>
           <button
             type="button"
             className={styles.muteButton}

@@ -34,6 +34,18 @@
     display: flex;
     align-items: center;
     transition: transform 0.3s, width 0.3s;
+
+    &[data-focus="true"] {
+      .volumeSlider {
+        transform: scale(1);
+        width: 100px;
+        &::-webkit-slider-thumb {
+          appearance: none;
+          transform: scale(1);
+          border-radius: 100%;
+        }
+      }
+    }
     .muteButton {
       position: relative;
       height: 32px;
