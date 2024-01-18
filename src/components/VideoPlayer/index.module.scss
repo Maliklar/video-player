@@ -9,6 +9,10 @@
   border: none;
   outline: none;
   border-radius: 16px;
+  cursor: none;
+  &[data-focus="true"] {
+    cursor: default;
+  }
   &:focus {
     outline: none;
   }
@@ -79,7 +83,7 @@
       right: -5px;
       bottom: -5px;
       height: 1px;
-      box-shadow: 0px 0px 100px 100px black;
+      box-shadow: 0px 0px 100px 80px black;
       z-index: -2;
     }
   }

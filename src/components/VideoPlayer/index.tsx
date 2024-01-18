@@ -1,9 +1,15 @@
-import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
+import debounce from "../../utils/debounce";
 import Ambient from "../Ambient";
 import Controls from "../Controls";
 import Progress from "../Progress";
 import styles from "./index.module.scss";
-import debounce from "../../utils/debounce";
 enum VideoStatusEnum {
   Playing,
   Paused,
@@ -37,8 +43,13 @@ type VideoContextType = {
 type Props = {
   src: string;
   ambient?: boolean;
+  autoFocus?: boolean;
 };
-export default function VideoPlayer({ src, ambient = false }: Props) {
+export default function VideoPlayer({
+  src,
+  ambient = false,
+  autoFocus = true,
+}: Props) {
   const [isPlaying, setIsPlaying] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -52,7 +63,11 @@ export default function VideoPlayer({ src, ambient = false }: Props) {
   const [focusProgress, setFocusProgress] = useState(false);
   const [videoLoaded, setVideoLoaded] = useState(false);
   const [focus, setFocus] = useState(false);
-
+  const changeVolume = useCallback((value: number) => {
+    setVolume(value);
+    setFocusVolume(true);
+    debounce(() => setFocusVolume(false), 3000);
+  }, []);
   useLayoutEffect(() => {
     setVideo(videoRef.current);
     setContainer(containerRef.current);
@@ -63,23 +78,11 @@ export default function VideoPlayer({ src, ambient = false }: Props) {
     function handler() {
       setVideoLoaded(true);
     }
-    videoRef?.current?.addEventListener("loadedmetadata", handler);
+    video?.addEventListener("loadedmetadata", handler);
     return () => {
-      videoRef?.current?.addEventListener("loadedmetadata", handler);
+      video?.addEventListener("loadedmetadata", handler);
     };
-  }, []);
-
-  useEffect(() => {
-    containerRef.current?.addEventListener("keydown", (e) => {
-      e.preventDefault();
-      if (e.code === "ArrowUp") volumeUp();
-      if (e.code === "ArrowDown") volumeDown();
-      if (e.code === "ArrowLeft") moveBackward();
-      if (e.code === "ArrowRight") moveForward();
-      if (e.code === "Space") pauseVideo();
-      if (e.code === "KeyF") toggleFullScreen();
-    });
-  }, []);
+  }, [video]);
 
   useEffect(() => {
     if (!videoRef?.current) return;
@@ -87,54 +90,93 @@ export default function VideoPlayer({ src, ambient = false }: Props) {
       if (!videoRef?.current?.volume) return;
       setVolume(videoRef.current.volume);
     }
-    videoRef?.current.addEventListener("volumechange", handler);
+    video?.addEventListener("volumechange", handler);
 
     return () => {
-      if (!videoRef?.current) return;
-      videoRef.current.removeEventListener("volumechange", handler);
+      video?.removeEventListener("volumechange", handler);
     };
-  }, []);
+  }, [video]);
 
-  function volumeUp() {
+  const volumeUp = useCallback(() => {
     if (!videoRef.current) return;
     changeVolume(
       videoRef.current.volume + 0.05 <= 1 ? videoRef.current.volume + 0.05 : 1
     );
-  }
-  function volumeDown() {
+  }, [changeVolume]);
+
+  const volumeDown = useCallback(() => {
     if (!videoRef.current) return;
     changeVolume(
       videoRef.current.volume - 0.05 >= 0 ? videoRef.current.volume - 0.05 : 0
     );
-  }
-  function moveForward() {
+  }, [changeVolume]);
+  const moveForward = useCallback(() => {
     if (!videoRef?.current) return;
     changeProgress(videoRef.current.currentTime + 5);
-  }
-  function moveBackward() {
+  }, []);
+  const moveBackward = useCallback(() => {
     if (!videoRef?.current) return;
     changeProgress(videoRef.current.currentTime - 5);
-  }
-  function pauseVideo() {}
-  function changeVolume(value: number) {
-    setVolume(value);
-    setFocusVolume(true);
-    debounce(() => setFocusVolume(false), 3000);
-  }
-  function togglePlay() {}
+  }, []);
 
-  function toggleFullScreen() {
+  const toggleFullScreen = useCallback(() => {
     if (isFullScreen) document.exitFullscreen();
     else containerRef.current?.requestFullscreen();
     setIsFullScreen((i) => !i);
-  }
-  function togglePlaying() {
-    setIsPlaying((playing) => {
-      !playing ? videoRef.current?.play() : videoRef.current?.pause();
-      return !playing;
-    });
-  }
+  }, [isFullScreen]);
+  const togglePlay = useCallback(() => {
+    debounce(() => {
+      setIsPlaying((playing) => {
+        !playing ? videoRef.current?.play() : videoRef.current?.pause();
+        return !playing;
+      });
+    }, 320);
+  }, []);
 
+  useEffect(() => {
+    function handler(e: globalThis.KeyboardEvent) {
+      e.preventDefault();
+      console.log(e.code);
+      switch (e.code) {
+        case "ArrowUp":
+          volumeUp();
+          break;
+        case "ArrowDown":
+          volumeDown();
+          break;
+        case "ArrowLeft":
+          moveBackward();
+          break;
+        case "ArrowRight":
+          moveForward();
+          break;
+        case "Space":
+          togglePlay();
+          break;
+        case "KeyF":
+          toggleFullScreen();
+          break;
+        case "KeyM":
+          changeVolume(0);
+          break;
+        default:
+      }
+    }
+    container?.addEventListener("keydown", handler);
+    console.log("TRIGGERED");
+    return () => {
+      container?.removeEventListener("keydown", handler);
+    };
+  }, [
+    container,
+    moveBackward,
+    moveForward,
+    toggleFullScreen,
+    volumeDown,
+    volumeUp,
+    togglePlay,
+    changeVolume,
+  ]);
   // Playing Change Handler
   useEffect(() => {
     if (!videoRef.current) return;
@@ -155,7 +197,9 @@ export default function VideoPlayer({ src, ambient = false }: Props) {
 
   function changeProgress(value: number) {
     if (!videoRef.current?.duration) return;
-    if (value < 0 || value > videoRef.current?.duration) return;
+    if (value < 0) value = 0;
+    if (value > videoRef.current?.duration) value = videoRef.current?.duration;
+
     setProgress(value);
     setFocusProgress(true);
     debounce(() => setFocusProgress(false), 3000);
@@ -173,8 +217,10 @@ export default function VideoPlayer({ src, ambient = false }: Props) {
   }, []);
 
   function updateFocus(value: boolean) {
-    if (value) setFocus(true);
-    else debounce(() => setFocus(value), 1000);
+    if (value) {
+      setFocus(value);
+      debounce(() => setFocus(false), 1000);
+    } else debounce(() => setFocus(value), 1000);
   }
 
   return (
@@ -200,6 +246,8 @@ export default function VideoPlayer({ src, ambient = false }: Props) {
         data-fullscreen={isFullScreen}
         onMouseOver={() => updateFocus(true)}
         onMouseLeave={() => updateFocus(false)}
+        onMouseMove={() => updateFocus(true)}
+        data-focus={focus}
       >
         <div className={styles.header} data-focus={focus}>
           <h3>TITLE</h3>
@@ -207,9 +255,11 @@ export default function VideoPlayer({ src, ambient = false }: Props) {
         <video
           src={src}
           className={styles.video}
+          autoFocus={autoFocus}
           ref={videoRef}
-          preload="true"
           onDoubleClick={toggleFullScreen}
+          onClick={togglePlay}
+          preload="true"
           controls={false}
           controlsList="nodownload nofullscreen noremoteplayback"
         />
@@ -217,7 +267,7 @@ export default function VideoPlayer({ src, ambient = false }: Props) {
           {videoLoaded ? <Progress /> : null}
           {videoLoaded ? (
             <Controls
-              onPlayChange={togglePlaying}
+              onPlayChange={togglePlay}
               isPlaying={isPlaying}
               video={videoRef.current}
               toggleFullScreen={toggleFullScreen}
