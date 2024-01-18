@@ -22,6 +22,8 @@ export default function Controls({
     changeVolume(Number(e.target.value));
   }
 
+  console.log(video, "KKKK");
+  if (!video) return null;
   return (
     <div className={styles.container}>
       <button
@@ -61,7 +63,12 @@ export default function Controls({
             value={volume}
           />
         </div>
-        <div className={styles.timerContainer}>{formatTime(progress)}</div>
+        <div className={styles.timerContainer}>{formatTime(progress)}</div>/
+        {video?.duration ? (
+          <div className={styles.timerContainer}>
+            {formatTime(video?.duration)}
+          </div>
+        ) : null}
       </div>
       <button
         className={styles.fullScreenButton}

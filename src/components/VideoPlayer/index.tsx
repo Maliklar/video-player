@@ -50,12 +50,23 @@ export default function VideoPlayer({ src, ambient = false }: Props) {
   const [container, setContainer] = useState(containerRef.current);
   const [focusVolume, setFocusVolume] = useState(false);
   const [focusProgress, setFocusProgress] = useState(false);
+  const [videoLoaded, setVideoLoaded] = useState(false);
 
   useLayoutEffect(() => {
     setVideo(videoRef.current);
     setContainer(containerRef.current);
     if (videoRef.current) videoRef.current.volume = volume;
   }, [volume]);
+
+  useEffect(() => {
+    function handler() {
+      setVideoLoaded(true);
+    }
+    videoRef?.current?.addEventListener("loadedmetadata", handler);
+    return () => {
+      videoRef?.current?.addEventListener("loadedmetadata", handler);
+    };
+  }, []);
 
   useEffect(() => {
     containerRef.current?.addEventListener("keydown", (e) => {
@@ -186,18 +197,21 @@ export default function VideoPlayer({ src, ambient = false }: Props) {
           src={src}
           className={styles.video}
           ref={videoRef}
+          preload="true"
           onDoubleClick={toggleFullScreen}
           controls={false}
           controlsList="nodownload nofullscreen noremoteplayback"
         />
         <div className={styles.footer}>
-          <Progress />
-          <Controls
-            onPlayChange={togglePlaying}
-            isPlaying={isPlaying}
-            video={videoRef.current}
-            toggleFullScreen={toggleFullScreen}
-          />
+          {videoLoaded ? <Progress /> : null}
+          {videoLoaded ? (
+            <Controls
+              onPlayChange={togglePlaying}
+              isPlaying={isPlaying}
+              video={videoRef.current}
+              toggleFullScreen={toggleFullScreen}
+            />
+          ) : null}
         </div>
       </div>
       <Ambient enabled={ambient} />
