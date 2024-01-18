@@ -51,6 +51,7 @@ export default function VideoPlayer({ src, ambient = false }: Props) {
   const [focusVolume, setFocusVolume] = useState(false);
   const [focusProgress, setFocusProgress] = useState(false);
   const [videoLoaded, setVideoLoaded] = useState(false);
+  const [focus, setFocus] = useState(false);
 
   useLayoutEffect(() => {
     setVideo(videoRef.current);
@@ -171,6 +172,11 @@ export default function VideoPlayer({ src, ambient = false }: Props) {
     };
   }, []);
 
+  function updateFocus(value: boolean) {
+    if (value) setFocus(true);
+    else debounce(() => setFocus(value), 1000);
+  }
+
   return (
     <Context.Provider
       value={{
@@ -192,7 +198,12 @@ export default function VideoPlayer({ src, ambient = false }: Props) {
         className={styles.container}
         ref={containerRef}
         data-fullscreen={isFullScreen}
+        onMouseOver={() => updateFocus(true)}
+        onMouseLeave={() => updateFocus(false)}
       >
+        <div className={styles.header} data-focus={focus}>
+          <h3>TITLE</h3>
+        </div>
         <video
           src={src}
           className={styles.video}
@@ -202,7 +213,7 @@ export default function VideoPlayer({ src, ambient = false }: Props) {
           controls={false}
           controlsList="nodownload nofullscreen noremoteplayback"
         />
-        <div className={styles.footer}>
+        <div className={styles.footer} data-focus={focus}>
           {videoLoaded ? <Progress /> : null}
           {videoLoaded ? (
             <Controls

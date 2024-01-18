@@ -22,8 +22,6 @@ export default function Controls({
     changeVolume(Number(e.target.value));
   }
 
-  console.log(video, "KKKK");
-  if (!video) return null;
   return (
     <div className={styles.container}>
       <button
