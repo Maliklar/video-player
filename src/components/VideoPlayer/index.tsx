@@ -25,6 +25,8 @@ export const Context = React.createContext<VideoContextType>({
   focusVolume: false,
   focusProgress: false,
   isFullScreen: false,
+  mute: false,
+  toggleMute: () => {},
 });
 
 type VideoContextType = {
@@ -37,9 +39,12 @@ type VideoContextType = {
   changeProgress: (e: number) => void;
   togglePlay: () => void;
   toggleFullScreen: () => void;
+  toggleMute: () => void;
+
   focusVolume: boolean;
   focusProgress: boolean;
   isFullScreen: boolean;
+  mute: boolean;
 };
 
 type Props = {
@@ -64,7 +69,14 @@ export default function VideoPlayer({
   const [focusVolume, setFocusVolume] = useState(false);
   const [focusProgress, setFocusProgress] = useState(false);
   const [videoLoaded, setVideoLoaded] = useState(false);
+  const [mute, setMute] = useState(false);
   const [focus, setFocus] = useState(false);
+  const toggleMute = useCallback(() => {
+    setMute((mute) => {
+      if (videoRef?.current) videoRef.current.muted = !mute;
+      return !mute;
+    });
+  }, []);
   const changeVolume = useCallback((value: number) => {
     setVolume(value);
     setFocusVolume(true);
@@ -158,7 +170,7 @@ export default function VideoPlayer({
           toggleFullScreen();
           break;
         case "KeyM":
-          changeVolume(0);
+          toggleMute();
           break;
         default:
       }
@@ -176,6 +188,7 @@ export default function VideoPlayer({
     volumeUp,
     togglePlay,
     changeVolume,
+    toggleMute,
   ]);
   // Playing Change Handler
   useEffect(() => {
@@ -238,6 +251,8 @@ export default function VideoPlayer({
         focusVolume,
         focusProgress,
         isFullScreen,
+        mute,
+        toggleMute,
       }}
     >
       <div

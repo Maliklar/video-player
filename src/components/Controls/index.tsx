@@ -21,12 +21,26 @@ export default function Controls({
   isPlaying,
   video,
 }: Props) {
-  const { volume, focusVolume, isFullScreen, progress, changeVolume } =
-    useVideo();
+  const {
+    volume,
+    focusVolume,
+    toggleMute,
+    mute,
+    isFullScreen,
+    progress,
+    changeVolume,
+  } = useVideo();
   function volumeChangeHandler(e: ChangeEvent<HTMLInputElement>) {
     changeVolume(Number(e.target.value));
   }
 
+  const image = mute
+    ? VolumeMute
+    : volume >= 0.5
+    ? VolumeMax
+    : volume === 0
+    ? VolumeMute
+    : VolumeMin;
   return (
     <div className={styles.container}>
       <button
@@ -37,7 +51,7 @@ export default function Controls({
       >
         <img
           className={styles.iconImage}
-          src={isPlaying ? Play : Pause}
+          src={isPlaying ? Pause : Play}
           alt="Toggle Play"
         />
       </button>
@@ -46,19 +60,10 @@ export default function Controls({
           <button
             type="button"
             className={styles.muteButton}
+            onClick={toggleMute}
             title="Mute/Unmute button"
           >
-            <img
-              className={styles.iconImage}
-              src={
-                volume >= 0.5
-                  ? VolumeMax
-                  : volume === 0
-                  ? VolumeMute
-                  : VolumeMin
-              }
-              alt="Volume Up"
-            />
+            <img className={styles.iconImage} src={image} alt="Volume" />
           </button>
           <input
             className={styles.volumeSlider}
