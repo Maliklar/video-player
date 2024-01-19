@@ -1,3 +1,5 @@
+import { HTMLAttributes } from "react";
+
 export enum VideoStatusEnum {
   Playing,
   Paused,
@@ -19,7 +21,8 @@ export type VideoContextType = {
   mute: boolean;
 };
 
-export type VideoPlayerProps = {
+type VideoElement = HTMLAttributes<HTMLVideoElement>;
+export type VideoPlayerProps = VideoElement & {
   src: string;
   ambient?: boolean;
   autoFocus?: boolean;

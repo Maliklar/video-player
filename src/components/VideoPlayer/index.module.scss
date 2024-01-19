@@ -13,7 +13,8 @@
         cursor: default;
     }
     &:focus {
-        outline: none;
+        // outline: none;
+        border: 1px yellow solid;
     }
     .header {
         position: absolute;

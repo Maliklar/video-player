@@ -36,6 +36,7 @@ export default function VideoPlayer({
   src,
   ambient = false,
   autoFocus = true,
+  ...props
 }: VideoPlayerProps) {
   const debounce = useDebounce();
   const [isPlaying, setIsPlaying] = useState(false);
@@ -68,7 +69,7 @@ export default function VideoPlayer({
     const duration = videoRef.current?.duration;
     if (!duration) return;
     videoRef.current.currentTime = clamp(value, duration);
-    setProgress(value);
+    setProgress(clamp(value, duration));
   }, []);
 
   // Mute toggler
@@ -82,7 +83,11 @@ export default function VideoPlayer({
 
   const changeVolume = useCallback((value: number) => {
     if (videoRef.current) videoRef.current.volume = clamp(value, 1);
-    setVolume(value);
+    if (videoRef.current?.muted) {
+      videoRef.current.muted = false;
+      setMute(false);
+    }
+    setVolume(clamp(value, 1));
   }, []);
 
   const toggleFullScreen = useCallback(() => {
@@ -118,6 +123,7 @@ export default function VideoPlayer({
     setVideo(video);
     setContainer(containerRef.current);
     video.volume = volume;
+    if (autoFocus) containerRef?.current?.focus();
   }
 
   function keyDownHandler(e: KeyboardEvent<HTMLDivElement>) {
@@ -178,8 +184,9 @@ export default function VideoPlayer({
       }}
     >
       <div
+        id="video"
         tabIndex={0}
-        autoFocus
+        autoFocus={autoFocus}
         className={styles.container}
         ref={containerRef}
         data-fullscreen={isFullScreen}
@@ -195,7 +202,6 @@ export default function VideoPlayer({
         <video
           src={src}
           className={styles.video}
-          autoFocus={autoFocus}
           ref={videoRef}
           onDoubleClick={toggleFullScreen}
           onClick={togglePlay}
