@@ -1,6 +1,6 @@
 import { ChangeEvent } from "react";
 import styles from "./index.module.scss";
-import useVideo from "../hooks/useVideo";
+import useVideo from "../../hooks/useVideo";
 
 export default function Progress() {
   const { progress, video, focusProgress, changeProgress } = useVideo();

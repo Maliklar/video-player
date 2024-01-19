@@ -1,6 +1,6 @@
 import styles from "./index.module.scss";
 import { useEffect, useRef, useState } from "react";
-import useVideo from "../hooks/useVideo";
+import useVideo from "../../hooks/useVideo";
 
 export default function Ambient({ enabled }: { enabled: boolean }) {
   const [scrolling, setScrolling] = useState(false);

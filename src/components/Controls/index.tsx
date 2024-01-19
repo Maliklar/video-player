@@ -7,7 +7,7 @@ import FullScreen from "../../assets/fullscreen.svg";
 import Play from "../../assets/play.svg";
 import Pause from "../../assets/pause.svg";
 import formatTime from "../../utils/formatTime";
-import useVideo from "../hooks/useVideo";
+import useVideo from "../../hooks/useVideo";
 import styles from "./index.module.scss";
 type Props = {
   onPlayChange: VoidFunction;

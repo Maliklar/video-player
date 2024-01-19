@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { Context } from "../VideoPlayer";
+import { Context } from "../components/VideoPlayer";
 
 export default function useVideo() {
   try {

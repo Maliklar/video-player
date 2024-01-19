@@ -1,19 +1,22 @@
 import React, {
+  KeyboardEvent,
+  SyntheticEvent,
   useCallback,
-  useEffect,
-  useLayoutEffect,
   useRef,
   useState,
 } from "react";
+import useDebounce from "../../hooks/useDebounce";
+import {
+  VideoContextType,
+  VideoPlayerProps,
+  VideoStatusEnum,
+} from "../../types";
+import { clamp } from "../../utils/clamp";
 import Ambient from "../Ambient";
 import Controls from "../Controls";
 import Progress from "../Progress";
 import styles from "./index.module.scss";
-import useDebounce from "../hooks/useDebounce";
-enum VideoStatusEnum {
-  Playing,
-  Paused,
-}
+
 export const Context = React.createContext<VideoContextType>({
   status: VideoStatusEnum.Paused,
   volume: 0.3,
@@ -29,33 +32,11 @@ export const Context = React.createContext<VideoContextType>({
   toggleMute: () => {},
 });
 
-type VideoContextType = {
-  container?: HTMLDivElement;
-  video?: HTMLVideoElement;
-  status: VideoStatusEnum;
-  volume: number;
-  progress: number;
-  changeVolume: (e: number) => void;
-  changeProgress: (e: number) => void;
-  togglePlay: () => void;
-  toggleFullScreen: () => void;
-  toggleMute: () => void;
-  focusVolume: boolean;
-  focusProgress: boolean;
-  isFullScreen: boolean;
-  mute: boolean;
-};
-
-type Props = {
-  src: string;
-  ambient?: boolean;
-  autoFocus?: boolean;
-};
 export default function VideoPlayer({
   src,
   ambient = false,
   autoFocus = true,
-}: Props) {
+}: VideoPlayerProps) {
   const debounce = useDebounce();
   const [isPlaying, setIsPlaying] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -83,22 +64,12 @@ export default function VideoPlayer({
   );
 
   // Update the progress of the video (currentTime)
-  const changeProgress = useCallback(
-    (value: number) => {
-      if (!videoRef.current?.duration) return;
-      if (value < 0) value = 0;
-      if (value > videoRef.current?.duration)
-        value = videoRef.current?.duration;
-
-      setProgress(value);
-      setFocusProgress(true);
-      debounce(() => setFocusProgress(false), 3000);
-      updateFocus(true);
-      const duration = videoRef.current?.duration;
-      if (duration) videoRef.current.currentTime = value;
-    },
-    [debounce, updateFocus]
-  );
+  const changeProgress = useCallback((value: number) => {
+    const duration = videoRef.current?.duration;
+    if (!duration) return;
+    videoRef.current.currentTime = clamp(value, duration);
+    setProgress(value);
+  }, []);
 
   // Mute toggler
   const toggleMute = useCallback(() => {
@@ -109,67 +80,10 @@ export default function VideoPlayer({
     updateFocus(true);
   }, [updateFocus]);
 
-  const changeVolume = useCallback(
-    (value: number) => {
-      setVolume(value);
-      setFocusVolume(true);
-      updateFocus(true);
-      debounce(() => setFocusVolume(false), 3000);
-    },
-    [debounce, updateFocus]
-  );
-
-  useLayoutEffect(() => {
-    setVideo(videoRef.current);
-    setContainer(containerRef.current);
-    if (videoRef.current) videoRef.current.volume = volume;
-  }, [volume]);
-
-  useEffect(() => {
-    function handler() {
-      setVideoLoaded(true);
-    }
-    video?.addEventListener("loadedmetadata", handler);
-    return () => {
-      video?.addEventListener("loadedmetadata", handler);
-    };
-  }, [video]);
-
-  useEffect(() => {
-    if (!videoRef?.current) return;
-    function handler() {
-      if (!videoRef?.current?.volume) return;
-      setVolume(videoRef.current.volume);
-    }
-    video?.addEventListener("volumechange", handler);
-
-    return () => {
-      video?.removeEventListener("volumechange", handler);
-    };
-  }, [video]);
-
-  const volumeUp = useCallback(() => {
-    if (!videoRef.current) return;
-    changeVolume(
-      videoRef.current.volume + 0.05 <= 1 ? videoRef.current.volume + 0.05 : 1
-    );
-  }, [changeVolume]);
-
-  const volumeDown = useCallback(() => {
-    if (!videoRef.current) return;
-    changeVolume(
-      videoRef.current.volume - 0.05 >= 0 ? videoRef.current.volume - 0.05 : 0
-    );
-  }, [changeVolume]);
-  const moveForward = useCallback(() => {
-    if (!videoRef?.current) return;
-    changeProgress(videoRef.current.currentTime + 5);
-  }, [changeProgress]);
-
-  const moveBackward = useCallback(() => {
-    if (!videoRef?.current) return;
-    changeProgress(videoRef.current.currentTime - 5);
-  }, [changeProgress]);
+  const changeVolume = useCallback((value: number) => {
+    if (videoRef.current) videoRef.current.volume = clamp(value, 1);
+    setVolume(value);
+  }, []);
 
   const toggleFullScreen = useCallback(() => {
     if (isFullScreen) document.exitFullscreen();
@@ -184,76 +98,66 @@ export default function VideoPlayer({
     });
   }, [updateFocus]);
 
-  useEffect(() => {
-    function handler(e: globalThis.KeyboardEvent) {
-      e.preventDefault();
-      switch (e.code) {
-        case "ArrowUp":
-          volumeUp();
-          break;
-        case "ArrowDown":
-          volumeDown();
-          break;
-        case "ArrowLeft":
-          moveBackward();
-          break;
-        case "ArrowRight":
-          moveForward();
-          break;
-        case "Space":
-          togglePlay();
-          break;
-        case "KeyF":
-          toggleFullScreen();
-          break;
-        case "KeyM":
-          toggleMute();
-          break;
-        default:
-      }
-    }
-    container?.addEventListener("keydown", handler);
-    return () => {
-      container?.removeEventListener("keydown", handler);
-    };
-  }, [
-    container,
-    moveBackward,
-    moveForward,
-    toggleFullScreen,
-    volumeDown,
-    volumeUp,
-    togglePlay,
-    changeVolume,
-    toggleMute,
-  ]);
-  // Playing Change Handler
-  useEffect(() => {
-    if (!videoRef.current) return;
-    const video = videoRef.current;
-    function onPlayHandler() {
-      setIsPlaying(true);
-    }
-    function onPauseHandler() {
-      setIsPlaying(false);
-    }
-    video.addEventListener("play", onPlayHandler);
-    video.addEventListener("pause", onPauseHandler);
-    return () => {
-      video.removeEventListener("play", onPlayHandler);
-      video.removeEventListener("pause", onPauseHandler);
-    };
-  }, []);
+  function timeUpdateHandler(e: SyntheticEvent<HTMLVideoElement, Event>) {
+    setProgress(e.currentTarget.currentTime);
+    updateFocus(true);
+    setFocusProgress(true);
+    debounce(() => setFocusProgress(false), 2000);
+  }
 
-  useEffect(() => {
-    const timeout = setInterval(() => {
-      if (videoRef.current) setProgress(videoRef.current?.currentTime);
-    }, 1000);
-    return () => {
-      clearInterval(timeout);
-    };
-  }, []);
+  function volumeChangeHandler(e: SyntheticEvent<HTMLVideoElement, Event>) {
+    setVolume(e.currentTarget.volume);
+    updateFocus(true);
+    setFocusVolume(true);
+    debounce(() => setFocusVolume(false), 2000);
+  }
 
+  function metaDataLoadedHandler(e: SyntheticEvent<HTMLVideoElement, Event>) {
+    const video = e.currentTarget;
+    setVideoLoaded(true);
+    setVideo(video);
+    setContainer(containerRef.current);
+    video.volume = volume;
+  }
+
+  function keyDownHandler(e: KeyboardEvent<HTMLDivElement>) {
+    e.preventDefault();
+    const video = videoRef?.current;
+    if (!video) return;
+    switch (e.code) {
+      case "ArrowUp":
+        changeVolume(volume + 0.05);
+        break;
+      case "ArrowDown":
+        changeVolume(volume - 0.05);
+        break;
+      case "ArrowLeft":
+        changeProgress(progress - 5);
+        break;
+      case "ArrowRight":
+        changeProgress(progress + 5);
+        break;
+      case "Space":
+        togglePlay();
+        break;
+      case "KeyF":
+        toggleFullScreen();
+        break;
+      case "KeyM":
+        toggleMute();
+        break;
+      default:
+    }
+  }
+
+  function playHandler() {
+    setIsPlaying(true);
+  }
+  function pauseHandler() {
+    setIsPlaying(false);
+  }
+
+  function canPlayHandler() {}
   return (
     <Context.Provider
       value={{
@@ -275,12 +179,14 @@ export default function VideoPlayer({
     >
       <div
         tabIndex={0}
+        autoFocus
         className={styles.container}
         ref={containerRef}
         data-fullscreen={isFullScreen}
         onMouseOver={() => updateFocus(true)}
         onMouseLeave={() => updateFocus(false)}
         onMouseMove={() => updateFocus(true)}
+        onKeyDown={keyDownHandler}
         data-focus={focus}
       >
         <div className={styles.header} data-focus={focus}>
@@ -295,6 +201,12 @@ export default function VideoPlayer({
           onClick={togglePlay}
           preload="true"
           controls={false}
+          onTimeUpdate={timeUpdateHandler}
+          onVolumeChange={volumeChangeHandler}
+          onLoadedMetadata={metaDataLoadedHandler}
+          onPlay={playHandler}
+          onPause={pauseHandler}
+          onCanPlay={canPlayHandler}
           controlsList="nodownload nofullscreen noremoteplayback"
         />
         <div className={styles.footer} data-focus={focus}>
