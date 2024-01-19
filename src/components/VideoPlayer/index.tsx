@@ -5,11 +5,11 @@ import React, {
   useRef,
   useState,
 } from "react";
-import debounce from "../../utils/debounce";
 import Ambient from "../Ambient";
 import Controls from "../Controls";
 import Progress from "../Progress";
 import styles from "./index.module.scss";
+import useDebounce from "../hooks/useDebounce";
 enum VideoStatusEnum {
   Playing,
   Paused,
@@ -40,7 +40,6 @@ type VideoContextType = {
   togglePlay: () => void;
   toggleFullScreen: () => void;
   toggleMute: () => void;
-
   focusVolume: boolean;
   focusProgress: boolean;
   isFullScreen: boolean;
@@ -57,9 +56,9 @@ export default function VideoPlayer({
   ambient = false,
   autoFocus = true,
 }: Props) {
+  const debounce = useDebounce();
   const [isPlaying, setIsPlaying] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
-
   const containerRef = useRef<HTMLDivElement>(null);
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -71,17 +70,55 @@ export default function VideoPlayer({
   const [videoLoaded, setVideoLoaded] = useState(false);
   const [mute, setMute] = useState(false);
   const [focus, setFocus] = useState(false);
+
+  // Focus: Handle showing the video controls
+  const updateFocus = useCallback(
+    (value: boolean) => {
+      if (value) {
+        setFocus(value);
+        debounce(() => setFocus(false), 3000);
+      } else debounce(() => setFocus(value), 3000);
+    },
+    [debounce]
+  );
+
+  // Update the progress of the video (currentTime)
+  const changeProgress = useCallback(
+    (value: number) => {
+      if (!videoRef.current?.duration) return;
+      if (value < 0) value = 0;
+      if (value > videoRef.current?.duration)
+        value = videoRef.current?.duration;
+
+      setProgress(value);
+      setFocusProgress(true);
+      debounce(() => setFocusProgress(false), 3000);
+      updateFocus(true);
+      const duration = videoRef.current?.duration;
+      if (duration) videoRef.current.currentTime = value;
+    },
+    [debounce, updateFocus]
+  );
+
+  // Mute toggler
   const toggleMute = useCallback(() => {
     setMute((mute) => {
       if (videoRef?.current) videoRef.current.muted = !mute;
       return !mute;
     });
-  }, []);
-  const changeVolume = useCallback((value: number) => {
-    setVolume(value);
-    setFocusVolume(true);
-    debounce(() => setFocusVolume(false), 3000);
-  }, []);
+    updateFocus(true);
+  }, [updateFocus]);
+
+  const changeVolume = useCallback(
+    (value: number) => {
+      setVolume(value);
+      setFocusVolume(true);
+      updateFocus(true);
+      debounce(() => setFocusVolume(false), 3000);
+    },
+    [debounce, updateFocus]
+  );
+
   useLayoutEffect(() => {
     setVideo(videoRef.current);
     setContainer(containerRef.current);
@@ -127,11 +164,12 @@ export default function VideoPlayer({
   const moveForward = useCallback(() => {
     if (!videoRef?.current) return;
     changeProgress(videoRef.current.currentTime + 5);
-  }, []);
+  }, [changeProgress]);
+
   const moveBackward = useCallback(() => {
     if (!videoRef?.current) return;
     changeProgress(videoRef.current.currentTime - 5);
-  }, []);
+  }, [changeProgress]);
 
   const toggleFullScreen = useCallback(() => {
     if (isFullScreen) document.exitFullscreen();
@@ -139,13 +177,12 @@ export default function VideoPlayer({
     setIsFullScreen((i) => !i);
   }, [isFullScreen]);
   const togglePlay = useCallback(() => {
-    debounce(() => {
-      setIsPlaying((playing) => {
-        !playing ? videoRef.current?.play() : videoRef.current?.pause();
-        return !playing;
-      });
-    }, 320);
-  }, []);
+    updateFocus(true);
+    setIsPlaying((playing) => {
+      !playing ? videoRef.current?.play() : videoRef.current?.pause();
+      return !playing;
+    });
+  }, [updateFocus]);
 
   useEffect(() => {
     function handler(e: globalThis.KeyboardEvent) {
@@ -208,18 +245,6 @@ export default function VideoPlayer({
     };
   }, []);
 
-  function changeProgress(value: number) {
-    if (!videoRef.current?.duration) return;
-    if (value < 0) value = 0;
-    if (value > videoRef.current?.duration) value = videoRef.current?.duration;
-
-    setProgress(value);
-    setFocusProgress(true);
-    debounce(() => setFocusProgress(false), 3000);
-    const duration = videoRef.current?.duration;
-    if (duration) videoRef.current.currentTime = value;
-  }
-
   useEffect(() => {
     const timeout = setInterval(() => {
       if (videoRef.current) setProgress(videoRef.current?.currentTime);
@@ -228,13 +253,6 @@ export default function VideoPlayer({
       clearInterval(timeout);
     };
   }, []);
-
-  function updateFocus(value: boolean) {
-    if (value) {
-      setFocus(value);
-      debounce(() => setFocus(false), 1000);
-    } else debounce(() => setFocus(value), 1000);
-  }
 
   return (
     <Context.Provider
