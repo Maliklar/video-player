@@ -7,6 +7,7 @@ import React, {
 } from "react";
 import useDebounce from "../../hooks/useDebounce";
 import {
+  PlayerComponentEnum,
   VideoContextType,
   VideoPlayerProps,
   VideoStatusEnum,
@@ -14,8 +15,10 @@ import {
 import { clamp } from "../../utils/clamp";
 import Ambient from "../Ambient";
 import Controls from "../Controls";
+import Header from "../Header";
 import Progress from "../Progress";
 import styles from "./index.module.scss";
+import DefaultHeader from "../DefaultComponents/DefaultHeader";
 
 export const Context = React.createContext<VideoContextType>({
   status: VideoStatusEnum.Paused,
@@ -30,14 +33,11 @@ export const Context = React.createContext<VideoContextType>({
   isFullScreen: false,
   mute: false,
   toggleMute: () => {},
+  focus: false,
+  isPlaying: false,
 });
 
-export default function VideoPlayer({
-  src,
-  ambient = false,
-  autoFocus = true,
-  ...props
-}: VideoPlayerProps) {
+export default function VideoPlayer({ children, ...props }: VideoPlayerProps) {
   const debounce = useDebounce();
   const [isPlaying, setIsPlaying] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -123,7 +123,7 @@ export default function VideoPlayer({
     setVideo(video);
     setContainer(containerRef.current);
     video.volume = volume;
-    if (autoFocus) containerRef?.current?.focus();
+    if (props.autoFocus) containerRef?.current?.focus();
   }
 
   function keyDownHandler(e: KeyboardEvent<HTMLDivElement>) {
@@ -164,6 +164,37 @@ export default function VideoPlayer({
   }
 
   function canPlayHandler() {}
+
+  const HeaderComponent =
+    children &&
+    !(children instanceof Array) &&
+    children.type.PlayerComponent === PlayerComponentEnum.Header
+      ? children
+      : children instanceof Array
+      ? children.find(
+          (item) => item.type.PlayerComponent === PlayerComponentEnum.Header
+        )
+      : null;
+  const FooterComponent =
+    children &&
+    !(children instanceof Array) &&
+    children.type.PlayerComponent === PlayerComponentEnum.Footer
+      ? children
+      : children instanceof Array
+      ? children.find(
+          (item) => item.type.PlayerComponent === PlayerComponentEnum.Footer
+        )
+      : null;
+  const ControlsComponent =
+    children &&
+    !(children instanceof Array) &&
+    children.type.PlayerComponent === PlayerComponentEnum.Controls
+      ? children
+      : children instanceof Array
+      ? children.find(
+          (item) => item.type.PlayerComponent === PlayerComponentEnum.Controls
+        )
+      : null;
   return (
     <Context.Provider
       value={{
@@ -181,12 +212,14 @@ export default function VideoPlayer({
         isFullScreen,
         mute,
         toggleMute,
+        focus,
+        isPlaying,
       }}
     >
       <div
         id="video"
         tabIndex={0}
-        autoFocus={autoFocus}
+        autoFocus={props.autoFocus}
         className={styles.container}
         ref={containerRef}
         data-fullscreen={isFullScreen}
@@ -196,11 +229,13 @@ export default function VideoPlayer({
         onKeyDown={keyDownHandler}
         data-focus={focus}
       >
-        <div className={styles.header} data-focus={focus}>
-          <h3>TITLE</h3>
-        </div>
+        {HeaderComponent ? (
+          HeaderComponent
+        ) : (
+          <DefaultHeader title={props.headerTitle} />
+        )}
         <video
-          src={src}
+          src={props.src}
           className={styles.video}
           ref={videoRef}
           onDoubleClick={toggleFullScreen}
@@ -215,19 +250,17 @@ export default function VideoPlayer({
           onCanPlay={canPlayHandler}
           controlsList="nodownload nofullscreen noremoteplayback"
         />
+
         <div className={styles.footer} data-focus={focus}>
           {videoLoaded ? <Progress /> : null}
-          {videoLoaded ? (
-            <Controls
-              onPlayChange={togglePlay}
-              isPlaying={isPlaying}
-              video={videoRef.current}
-              toggleFullScreen={toggleFullScreen}
-            />
-          ) : null}
+          {videoLoaded ? <Controls /> : null}
         </div>
       </div>
-      <Ambient enabled={ambient} />
+      <Ambient enabled={props?.ambient} />
     </Context.Provider>
   );
 }
+
+VideoPlayer.Header = Header;
+VideoPlayer.Controls = Controls;
+VideoPlayer.Progress = Progress;

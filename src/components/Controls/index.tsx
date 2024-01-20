@@ -15,12 +15,7 @@ type Props = {
   toggleFullScreen: VoidFunction;
   video: HTMLVideoElement | null;
 };
-export default function Controls({
-  onPlayChange,
-  toggleFullScreen,
-  isPlaying,
-  video,
-}: Props) {
+export default function Controls() {
   const {
     volume,
     focusVolume,
@@ -29,6 +24,10 @@ export default function Controls({
     isFullScreen,
     progress,
     changeVolume,
+    isPlaying,
+    togglePlay,
+    toggleFullScreen,
+    video,
   } = useVideo();
   function volumeChangeHandler(e: ChangeEvent<HTMLInputElement>) {
     changeVolume(Number(e.target.value));
@@ -45,7 +44,7 @@ export default function Controls({
     <div className={styles.container}>
       <button
         title="Play"
-        onClick={onPlayChange}
+        onClick={togglePlay}
         className={styles.playButton}
         type="button"
       >
@@ -98,18 +97,3 @@ export default function Controls({
     </div>
   );
 }
-
-// type PlayProps = {
-//   isPlaying: boolean;
-// };
-// function PlayIcon({ isPlaying = false }: PlayProps) {
-//   return <div className={styles.PlayIcon} data-playing={isPlaying} />;
-// }
-
-// function FullScreenIcon() {
-//   return <div className={styles.fullScreenIcon}></div>;
-// }
-
-// function PauseIcon() {
-//   return <div className={styles.pauseIcon}></div>;
-// }

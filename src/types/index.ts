@@ -1,5 +1,13 @@
-import { HTMLAttributes } from "react";
+import { HTMLAttributes, ReactElement } from "react";
+import VideoPlayer from "../components/VideoPlayer";
 
+export enum PlayerComponentEnum {
+  Controls,
+  Header,
+  Footer,
+  Progress,
+  VolumeController,
+}
 export enum VideoStatusEnum {
   Playing,
   Paused,
@@ -19,11 +27,26 @@ export type VideoContextType = {
   focusProgress: boolean;
   isFullScreen: boolean;
   mute: boolean;
+  focus: boolean;
+  isPlaying: boolean;
 };
 
-type VideoElement = HTMLAttributes<HTMLVideoElement>;
+type VideoElement = Omit<HTMLAttributes<HTMLVideoElement>, "children">;
+
+type ChildrenType =
+  | (ReactElement<typeof VideoPlayer> & {
+      type: { PlayerComponent: PlayerComponentEnum };
+    })
+  | Array<
+      ReactElement<typeof VideoPlayer> & {
+        type: { PlayerComponent: PlayerComponentEnum };
+      }
+    >;
+
 export type VideoPlayerProps = VideoElement & {
   src: string;
   ambient?: boolean;
   autoFocus?: boolean;
+  children?: ChildrenType;
+  headerTitle?: string;
 };
