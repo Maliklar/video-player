@@ -1,8 +1,8 @@
 import { ChangeEvent } from "react";
 import styles from "./index.module.scss";
-import useVideo from "../../hooks/useVideo";
+import useVideo from "../../../hooks/useVideo";
 
-export default function Progress() {
+export default function ProgressController() {
   const { progress, video, focusProgress, changeProgress } = useVideo();
   function progressChangeHandler(e: ChangeEvent<HTMLInputElement>) {
     changeProgress(Number(e.target.value));

@@ -1,45 +1,22 @@
-import { ChangeEvent } from "react";
-import VolumeMax from "../../assets/volume-max.svg";
-import VolumeMin from "../../assets/volume-min.svg";
-import VolumeMute from "../../assets/volume-mute.svg";
 import FullScreenMin from "../../assets/fullscreen-min.svg";
 import FullScreen from "../../assets/fullscreen.svg";
-import Play from "../../assets/play.svg";
 import Pause from "../../assets/pause.svg";
-import formatTime from "../../utils/formatTime";
+import Play from "../../assets/play.svg";
 import useVideo from "../../hooks/useVideo";
+import formatTime from "../../utils/formatTime";
+import VolumeController from "./VolumeController";
 import styles from "./index.module.scss";
-type Props = {
-  onPlayChange: VoidFunction;
-  isPlaying: boolean;
-  toggleFullScreen: VoidFunction;
-  video: HTMLVideoElement | null;
-};
+
 export default function Controls() {
   const {
-    volume,
-    focusVolume,
-    toggleMute,
-    mute,
     isFullScreen,
     progress,
-    changeVolume,
     isPlaying,
     togglePlay,
     toggleFullScreen,
     video,
   } = useVideo();
-  function volumeChangeHandler(e: ChangeEvent<HTMLInputElement>) {
-    changeVolume(Number(e.target.value));
-  }
 
-  const image = mute
-    ? VolumeMute
-    : volume >= 0.5
-    ? VolumeMax
-    : volume === 0
-    ? VolumeMute
-    : VolumeMin;
   return (
     <div className={styles.container}>
       <button
@@ -55,26 +32,7 @@ export default function Controls() {
         />
       </button>
       <div className={styles.middle}>
-        <div data-focus={focusVolume} className={styles.volumeController}>
-          <button
-            type="button"
-            className={styles.muteButton}
-            onClick={toggleMute}
-            title="Mute/Unmute button"
-          >
-            <img className={styles.iconImage} src={image} alt="Volume" />
-          </button>
-          <input
-            className={styles.volumeSlider}
-            title="Volume"
-            type="range"
-            min="0"
-            step="0.01"
-            max="1"
-            onChange={volumeChangeHandler}
-            value={volume}
-          />
-        </div>
+        <VolumeController />
         <div className={styles.timerContainer}>{formatTime(progress)}</div>/
         {video?.duration ? (
           <div className={styles.timerContainer}>

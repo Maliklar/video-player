@@ -15,10 +15,13 @@ import {
 import { clamp } from "../../utils/clamp";
 import Ambient from "../Ambient";
 import Controls from "../Controls";
-import Header from "../Header";
-import Progress from "../Progress";
-import styles from "./index.module.scss";
+import ProgressController from "../Controls/ProgressController";
+import VolumeController from "../Controls/VolumeController";
 import DefaultHeader from "../DefaultComponents/DefaultHeader";
+import Footer from "../Footer";
+import Header from "../Header";
+import styles from "./index.module.scss";
+import DefaultProgressController from "../DefaultComponents/DefaultProgressController";
 
 export const Context = React.createContext<VideoContextType>({
   status: VideoStatusEnum.Paused,
@@ -35,6 +38,7 @@ export const Context = React.createContext<VideoContextType>({
   toggleMute: () => {},
   focus: false,
   isPlaying: false,
+  videoLoaded: false,
 });
 
 export default function VideoPlayer({ children, ...props }: VideoPlayerProps) {
@@ -185,14 +189,15 @@ export default function VideoPlayer({ children, ...props }: VideoPlayerProps) {
           (item) => item.type.PlayerComponent === PlayerComponentEnum.Footer
         )
       : null;
-  const ControlsComponent =
+  const ProgressController =
     children &&
     !(children instanceof Array) &&
-    children.type.PlayerComponent === PlayerComponentEnum.Controls
+    children.type.PlayerComponent === PlayerComponentEnum.ProgressController
       ? children
       : children instanceof Array
       ? children.find(
-          (item) => item.type.PlayerComponent === PlayerComponentEnum.Controls
+          (item) =>
+            item.type.PlayerComponent === PlayerComponentEnum.ProgressController
         )
       : null;
   return (
@@ -214,6 +219,7 @@ export default function VideoPlayer({ children, ...props }: VideoPlayerProps) {
         toggleMute,
         focus,
         isPlaying,
+        videoLoaded,
       }}
     >
       <div
@@ -251,10 +257,20 @@ export default function VideoPlayer({ children, ...props }: VideoPlayerProps) {
           controlsList="nodownload nofullscreen noremoteplayback"
         />
 
-        <div className={styles.footer} data-focus={focus}>
-          {videoLoaded ? <Progress /> : null}
-          {videoLoaded ? <Controls /> : null}
-        </div>
+        {videoLoaded ? (
+          FooterComponent ? (
+            FooterComponent
+          ) : (
+            <Footer>
+              {ProgressController ? (
+                ProgressController
+              ) : (
+                <DefaultProgressController />
+              )}
+              {videoLoaded ? <Controls /> : null}
+            </Footer>
+          )
+        ) : null}
       </div>
       <Ambient enabled={props?.ambient} />
     </Context.Provider>
@@ -262,5 +278,6 @@ export default function VideoPlayer({ children, ...props }: VideoPlayerProps) {
 }
 
 VideoPlayer.Header = Header;
-VideoPlayer.Controls = Controls;
-VideoPlayer.Progress = Progress;
+VideoPlayer.ProgressController = ProgressController;
+VideoPlayer.VolumeController = VolumeController;
+VideoPlayer.Footer = Footer;

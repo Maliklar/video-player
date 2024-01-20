@@ -5,7 +5,7 @@ export enum PlayerComponentEnum {
   Controls,
   Header,
   Footer,
-  Progress,
+  ProgressController,
   VolumeController,
 }
 export enum VideoStatusEnum {
@@ -29,6 +29,7 @@ export type VideoContextType = {
   mute: boolean;
   focus: boolean;
   isPlaying: boolean;
+  videoLoaded: boolean;
 };
 
 type VideoElement = Omit<HTMLAttributes<HTMLVideoElement>, "children">;
