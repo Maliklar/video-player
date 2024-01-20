@@ -1,6 +1,7 @@
 import { ChangeEvent } from "react";
 import styles from "./index.module.scss";
 import useVideo from "../../../hooks/useVideo";
+import { PlayerComponentEnum } from "../../../types";
 
 export default function ProgressController() {
   const { progress, video, focusProgress, changeProgress } = useVideo();
@@ -23,3 +24,4 @@ export default function ProgressController() {
     </div>
   );
 }
+ProgressController.PlayerComponent = PlayerComponentEnum.ProgressController;

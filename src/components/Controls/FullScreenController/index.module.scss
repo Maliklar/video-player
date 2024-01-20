@@ -1,0 +1,5 @@
+@import "../../VideoPlayer/root.module.scss";
+
+.container {
+  @include controlButtonMixin();
+}

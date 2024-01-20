@@ -1,4 +1,19 @@
 $animation-time: 0.3s;
+@mixin controlButtonMixin() {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  @include size(32px);
+  transition: transform 0.3s;
+  &:hover {
+    transform: scale(1.1);
+  }
+  .iconImage {
+    height: inherit;
+    width: inherit;
+  }
+}
 
 .rootPlayer {
   position: relative;

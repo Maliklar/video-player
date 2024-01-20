@@ -15,7 +15,7 @@ function App() {
       >
         <div>asdf</div>
 
-        <VideoPlayer src="/test1.mp4" ambient headerTitle="Malik">
+        <VideoPlayer src="/test1.mp4" ambient headerTitle="Malik" autoFocus>
           <VideoPlayer.Header children="asdf" />
         </VideoPlayer>
         <div>asdf</div>

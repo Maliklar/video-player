@@ -1,5 +1,5 @@
-import ProgressController from "../Controls/ProgressController";
+import VolumeController from "../Controls/VolumeController";
 
-export default function DefaultProgress() {
-  return <ProgressController />;
+export default function DefaultVolumeController() {
+  return <VolumeController />;
 }

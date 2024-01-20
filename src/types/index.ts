@@ -7,6 +7,9 @@ export enum PlayerComponentEnum {
   Footer,
   ProgressController,
   VolumeController,
+  PlayController,
+  FullScreenController,
+  TimerDisplay,
 }
 export enum VideoStatusEnum {
   Playing,

@@ -13,8 +13,7 @@
     cursor: default;
   }
   &:focus {
-    // outline: none;
-    border: 1px yellow solid;
+    outline: none;
   }
 
   & button {
