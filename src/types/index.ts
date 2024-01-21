@@ -53,4 +53,5 @@ export type VideoPlayerProps = VideoElement & {
   autoFocus?: boolean;
   children?: ChildrenType;
   headerTitle?: string;
+  ready: (video: VideoContextType) => void;
 };

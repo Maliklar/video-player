@@ -7,7 +7,6 @@ import React, {
 } from "react";
 import useDebounce from "../../hooks/useDebounce";
 import {
-  PlayerComponentEnum,
   VideoContextType,
   VideoPlayerProps,
   VideoStatusEnum,
@@ -15,13 +14,14 @@ import {
 import { clamp } from "../../utils/clamp";
 import Ambient from "../Ambient";
 import Controls from "../Controls";
+import FullScreenController from "../Controls/FullScreenController";
+import PlayController from "../Controls/PlayController";
 import ProgressController from "../Controls/ProgressController";
+import TimerDisplay from "../Controls/TimerDisplay";
 import VolumeController from "../Controls/VolumeController";
-import DefaultHeader from "../DefaultComponents/DefaultHeader";
 import Footer from "../Footer";
 import Header from "../Header";
 import styles from "./index.module.scss";
-import DefaultProgressController from "../DefaultComponents/DefaultProgressController";
 
 export const Context = React.createContext<VideoContextType>({
   status: VideoStatusEnum.Paused,
@@ -41,7 +41,13 @@ export const Context = React.createContext<VideoContextType>({
   videoLoaded: false,
 });
 
-export default function VideoPlayer({ children, ...props }: VideoPlayerProps) {
+export default function VideoPlayer({
+  children,
+  ambient = false,
+  headerTitle,
+  ready,
+  ...props
+}: VideoPlayerProps) {
   const debounce = useDebounce();
   const [isPlaying, setIsPlaying] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -112,6 +118,7 @@ export default function VideoPlayer({ children, ...props }: VideoPlayerProps) {
     updateFocus(true);
     setFocusProgress(true);
     debounce(() => setFocusProgress(false), 2000);
+    props.onTimeUpdate && props.onTimeUpdate(e);
   }
 
   function volumeChangeHandler(e: SyntheticEvent<HTMLVideoElement, Event>) {
@@ -119,6 +126,7 @@ export default function VideoPlayer({ children, ...props }: VideoPlayerProps) {
     updateFocus(true);
     setFocusVolume(true);
     debounce(() => setFocusVolume(false), 2000);
+    props.onVolumeChange && props.onVolumeChange(e);
   }
 
   function metaDataLoadedHandler(e: SyntheticEvent<HTMLVideoElement, Event>) {
@@ -128,6 +136,27 @@ export default function VideoPlayer({ children, ...props }: VideoPlayerProps) {
     setContainer(containerRef.current);
     video.volume = volume;
     if (props.autoFocus) containerRef?.current?.focus();
+    props.onLoadedMetadata && props.onLoadedMetadata(e);
+    ready &&
+      ready({
+        container: container || undefined,
+        video: video || undefined,
+        status: VideoStatusEnum.Playing,
+        progress,
+        volume,
+        changeVolume,
+        changeProgress,
+        togglePlay,
+        toggleFullScreen,
+        focusVolume,
+        focusProgress,
+        isFullScreen,
+        mute,
+        toggleMute,
+        focus,
+        isPlaying,
+        videoLoaded,
+      });
   }
 
   function keyDownHandler(e: KeyboardEvent<HTMLDivElement>) {
@@ -167,39 +196,12 @@ export default function VideoPlayer({ children, ...props }: VideoPlayerProps) {
     setIsPlaying(false);
   }
 
-  function canPlayHandler() {}
-
-  const HeaderComponent =
-    children &&
-    !(children instanceof Array) &&
-    children.type.PlayerComponent === PlayerComponentEnum.Header
-      ? children
-      : children instanceof Array
-      ? children.find(
-          (item) => item.type.PlayerComponent === PlayerComponentEnum.Header
-        )
-      : null;
-  const FooterComponent =
-    children &&
-    !(children instanceof Array) &&
-    children.type.PlayerComponent === PlayerComponentEnum.Footer
-      ? children
-      : children instanceof Array
-      ? children.find(
-          (item) => item.type.PlayerComponent === PlayerComponentEnum.Footer
-        )
-      : null;
-  const ProgressController =
-    children &&
-    !(children instanceof Array) &&
-    children.type.PlayerComponent === PlayerComponentEnum.ProgressController
-      ? children
-      : children instanceof Array
-      ? children.find(
-          (item) =>
-            item.type.PlayerComponent === PlayerComponentEnum.ProgressController
-        )
-      : null;
+  function videoClickHandler(
+    e: React.MouseEvent<HTMLVideoElement, MouseEvent>
+  ) {
+    togglePlay();
+    props.onClick && props.onClick(e);
+  }
   return (
     <Context.Provider
       value={{
@@ -235,44 +237,23 @@ export default function VideoPlayer({ children, ...props }: VideoPlayerProps) {
         onKeyDown={keyDownHandler}
         data-focus={focus}
       >
-        {HeaderComponent ? (
-          HeaderComponent
-        ) : (
-          <DefaultHeader title={props.headerTitle} />
-        )}
+        {videoLoaded ? children : null}
         <video
-          src={props.src}
           className={styles.video}
           ref={videoRef}
           onDoubleClick={toggleFullScreen}
-          onClick={togglePlay}
-          preload="true"
+          onClick={videoClickHandler}
           controls={false}
           onTimeUpdate={timeUpdateHandler}
           onVolumeChange={volumeChangeHandler}
           onLoadedMetadata={metaDataLoadedHandler}
           onPlay={playHandler}
           onPause={pauseHandler}
-          onCanPlay={canPlayHandler}
           controlsList="nodownload nofullscreen noremoteplayback"
+          {...props}
         />
-
-        {videoLoaded ? (
-          FooterComponent ? (
-            FooterComponent
-          ) : (
-            <Footer>
-              {ProgressController ? (
-                ProgressController
-              ) : (
-                <DefaultProgressController />
-              )}
-              {videoLoaded ? <Controls /> : null}
-            </Footer>
-          )
-        ) : null}
       </div>
-      <Ambient enabled={props?.ambient} />
+      <Ambient enabled={ambient} />
     </Context.Provider>
   );
 }
@@ -281,3 +262,7 @@ VideoPlayer.Header = Header;
 VideoPlayer.ProgressController = ProgressController;
 VideoPlayer.VolumeController = VolumeController;
 VideoPlayer.Footer = Footer;
+VideoPlayer.FullScreenController = FullScreenController;
+VideoPlayer.TimerDisplay = TimerDisplay;
+VideoPlayer.PlayController = PlayController;
+VideoPlayer.Controls = Controls;

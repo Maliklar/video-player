@@ -1,7 +1,14 @@
+import { useRef } from "react";
 import "./App.css";
 import VideoPlayer from "./components/VideoPlayer";
+import { VideoContextType } from "./types";
+import Player from "./components/index";
 
 function App() {
+  const video = useRef<VideoContextType>();
+  function readyHandler(v: VideoContextType) {
+    video.current = v;
+  }
   return (
     <div className="App">
       <div>asdf</div>
@@ -14,10 +21,14 @@ function App() {
         }}
       >
         <div>asdf</div>
+        <Player
+          src="/test1.mp4"
+          ambient
+          autoFocus
+          headerTitle="My Title"
+          ready={readyHandler}
+        />
 
-        <VideoPlayer src="/test1.mp4" ambient headerTitle="Malik" autoFocus>
-          <VideoPlayer.Header children="asdf" />
-        </VideoPlayer>
         <div>asdf</div>
       </div>
       <div>asdf</div>

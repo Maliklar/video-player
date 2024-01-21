@@ -1,6 +1,9 @@
-import styles from "./index.module.scss";
-import { useEffect, useRef, useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import useVideo from "../../hooks/useVideo";
+import styles from "./index.module.scss";
+const portal = document.createElement("div");
+portal.setAttribute("id", styles.container);
 
 export default function Ambient({ enabled }: { enabled?: boolean }) {
   const [scrolling, setScrolling] = useState(false);
@@ -49,12 +52,21 @@ export default function Ambient({ enabled }: { enabled?: boolean }) {
   }, []);
 
   return (
-    <div
-      ref={ambientRef}
-      className={styles.container}
-      data-scrolling={scrolling}
-    >
-      <canvas ref={canvasRef} className={styles.ambientImage} />
-    </div>
+    <Portal>
+      <div
+        ref={ambientRef}
+        className={styles.container}
+        data-scrolling={scrolling}
+      >
+        <canvas ref={canvasRef} className={styles.ambientImage} />
+      </div>
+    </Portal>
   );
+}
+
+type PortalProps = {
+  children: ReactNode;
+};
+function Portal({ children }: PortalProps) {
+  return createPortal(children, document.body);
 }

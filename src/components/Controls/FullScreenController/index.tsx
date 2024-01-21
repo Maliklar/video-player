@@ -1,17 +1,26 @@
-import useVideo from "../../../hooks/useVideo";
-import styles from "./index.module.scss";
+import { ButtonHTMLAttributes, DetailedHTMLProps } from "react";
 import FullScreenMin from "../../../assets/fullscreen-min.svg";
 import FullScreen from "../../../assets/fullscreen.svg";
+import useVideo from "../../../hooks/useVideo";
 import { PlayerComponentEnum } from "../../../types";
+import styles from "./index.module.scss";
 
-export default function FullScreenController() {
+type Props = DetailedHTMLProps<
+  ButtonHTMLAttributes<HTMLButtonElement>,
+  HTMLButtonElement
+>;
+export default function FullScreenController({
+  type,
+  className,
+  ...props
+}: Props) {
   const { isFullScreen, toggleFullScreen } = useVideo();
   return (
     <button
-      className={styles.container}
+      className={`${styles.container} ${className}`}
       type="button"
-      title="Full screen"
       onClick={toggleFullScreen}
+      {...props}
     >
       <img
         className={styles.iconImage}
