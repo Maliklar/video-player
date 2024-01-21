@@ -1,8 +1,7 @@
 import { useRef } from "react";
 import "./App.css";
-import VideoPlayer from "./components/VideoPlayer";
-import { VideoContextType } from "./types";
 import Player from "./components/index";
+import { VideoContextType } from "./types";
 
 function App() {
   const video = useRef<VideoContextType>();
