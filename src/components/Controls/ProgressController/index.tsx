@@ -3,7 +3,7 @@ import styles from "./index.module.scss";
 import useVideo from "../../../hooks/useVideo";
 import { PlayerComponentEnum } from "../../../types";
 
-export default function ProgressController() {
+function ProgressController() {
   const { progress, video, focusProgress, changeProgress } = useVideo();
   function progressChangeHandler(e: ChangeEvent<HTMLInputElement>) {
     changeProgress(Number(e.target.value));
@@ -25,3 +25,4 @@ export default function ProgressController() {
   );
 }
 ProgressController.PlayerComponent = PlayerComponentEnum.ProgressController;
+export default ProgressController;

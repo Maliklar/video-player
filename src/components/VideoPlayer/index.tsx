@@ -41,7 +41,7 @@ export const Context = React.createContext<VideoContextType>({
   videoLoaded: false,
 });
 
-export default function VideoPlayer({
+function VideoPlayer({
   children,
   ambient = false,
   headerTitle,
@@ -266,3 +266,5 @@ VideoPlayer.FullScreenController = FullScreenController;
 VideoPlayer.TimerDisplay = TimerDisplay;
 VideoPlayer.PlayController = PlayController;
 VideoPlayer.Controls = Controls;
+
+export default VideoPlayer;

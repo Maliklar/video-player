@@ -4,7 +4,7 @@ import styles from "./index.module.scss";
 import { PlayerComponentEnum } from "../../types";
 
 type Props = HTMLAttributes<HTMLDivElement>;
-export default function Header({ className, ...props }: Props) {
+function Header({ className, ...props }: Props) {
   const { focus } = useVideo();
   return (
     <div
@@ -15,3 +15,4 @@ export default function Header({ className, ...props }: Props) {
   );
 }
 Header.PlayerComponent = PlayerComponentEnum.Header;
+export default Header;

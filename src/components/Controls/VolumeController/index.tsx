@@ -5,7 +5,7 @@ import VolumeMin from "../../../assets/volume-min.svg";
 import VolumeMute from "../../../assets/volume-mute.svg";
 import { ChangeEvent } from "react";
 import { PlayerComponentEnum } from "../../../types";
-export default function VolumeController() {
+function VolumeController() {
   const { focusVolume, volume, mute, changeVolume, toggleMute } = useVideo();
   const image = mute
     ? VolumeMute
@@ -43,3 +43,4 @@ export default function VolumeController() {
 }
 
 VolumeController.PlayerComponent = PlayerComponentEnum.VolumeController;
+export default VolumeController;

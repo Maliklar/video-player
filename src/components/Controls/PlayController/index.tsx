@@ -4,7 +4,7 @@ import Pause from "../../../assets/pause.svg";
 import Play from "../../../assets/play.svg";
 import { PlayerComponentEnum } from "../../../types";
 
-export default function PlayController() {
+function PlayController() {
   const { togglePlay, isPlaying } = useVideo();
   return (
     <button
@@ -22,3 +22,4 @@ export default function PlayController() {
   );
 }
 PlayController.PlayerComponent = PlayerComponentEnum.PlayController;
+export default PlayController;

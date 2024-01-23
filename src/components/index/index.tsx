@@ -2,7 +2,7 @@ import { VideoPlayerProps } from "../../types";
 import VideoPlayer from "../VideoPlayer";
 
 type Props = VideoPlayerProps;
-export default function Player(props: Props) {
+function Player(props: Props) {
   return (
     <VideoPlayer {...props}>
       <VideoPlayer.Header>{props.headerTitle}</VideoPlayer.Header>
@@ -13,3 +13,4 @@ export default function Player(props: Props) {
     </VideoPlayer>
   );
 }
+export default Player;

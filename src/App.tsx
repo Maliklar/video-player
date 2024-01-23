@@ -20,13 +20,7 @@ function App() {
         }}
       >
         <div>asdf</div>
-        <Player
-          src="/test1.mp4"
-          ambient
-          autoFocus
-          headerTitle="My Title"
-          ready={readyHandler}
-        />
+        <Player src="/test1.mp4" ambient autoFocus ready={readyHandler} />
 
         <div>asdf</div>
       </div>

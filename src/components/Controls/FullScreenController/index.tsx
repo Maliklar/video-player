@@ -9,11 +9,7 @@ type Props = DetailedHTMLProps<
   ButtonHTMLAttributes<HTMLButtonElement>,
   HTMLButtonElement
 >;
-export default function FullScreenController({
-  type,
-  className,
-  ...props
-}: Props) {
+function FullScreenController({ type, className, ...props }: Props) {
   const { isFullScreen, toggleFullScreen } = useVideo();
   return (
     <button
@@ -32,3 +28,4 @@ export default function FullScreenController({
 }
 
 FullScreenController.PlayerComponent = PlayerComponentEnum.FullScreenController;
+export default FullScreenController;

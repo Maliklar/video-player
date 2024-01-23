@@ -1,7 +1,7 @@
 import useVideo from "../../../hooks/useVideo";
 import formatTime from "../../../utils/formatTime";
 import styles from "./index.module.scss";
-export default function TimerDisplay() {
+function TimerDisplay() {
   const { progress, video } = useVideo();
   return (
     <div className={styles.container}>
@@ -12,3 +12,5 @@ export default function TimerDisplay() {
     </div>
   );
 }
+
+export default TimerDisplay;
